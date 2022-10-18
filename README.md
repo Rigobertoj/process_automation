@@ -1,2 +1,2 @@
 # process_automation
-Una proyecto gtenerado para la automatizacion de procesos pára PROFILE
+Una proyecto generado para la automatizacion de procesos pára PROFILE
