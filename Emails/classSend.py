@@ -1,12 +1,9 @@
 from email import message
 from multiprocessing import context
-from re import sub
-from typing import Type
 import dotenv
 import ssl
 import email
 import smtplib
-import csv
 from datetime import datetime
 from formatEstadoCuenta import HTML
 
