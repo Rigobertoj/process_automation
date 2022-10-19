@@ -24,17 +24,26 @@ class processValidator():
             self.sheet_name = Excel_doc.set_sheet_name(sheet_name)
 
     def _delete_cell(self, tittle: str, data_list: list):
+        """Metodo que nos permite eliminar una cellda de la columna
+        utilicece para eliminar el titulo de la columna
+        """
         new_lits = [item.value for item in data_list if item.value != tittle]
         return new_lits
 
 
     def _get_colum(self, name_colum: str,) -> list:
+        """ metodo que nos permite obtener cualquier columna de la hoja de excel"""
         for colum in list(self.sheet_name.columns):
             for cell in colum:
                 if name_colum in str(cell.value):
-                    column_data = colum
-                    return column_data
-
+                    column_celda = list(colum)
+        return column_celda
+        
+    
+    def _get_values(self, column:list) -> list:
+        """retorna una lista con los valores de la columna que se le introduscan"""
+        column_value = [cell.value  for cell in column]
+        return column_value
     
     def _evalue_date(self, list_dates: list[str], dias: int ) -> dict[list, list]:
         """
@@ -54,15 +63,17 @@ class processValidator():
 
         #fecha actul
         año_actual, mes_actual, dia_actual = str(self.current_date).split("-")
+        print(f"{año_actual},{mes_actual},{dia_actual}")
 
         #dias que tiene el mes actual 
-        numero_dias_mes_pasado = monthrange(int(año_actual), int(mes_actual) - 1)
+        numero_dias_mes_pasado = monthrange(int(año_actual), int(mes_actual)- 1)
 
         #lista de los dias donde se enviaran los emails
         fechas_envios_emails = []
         for date in fechas_corte["dias_de_corte"]:
             #si el dia actual es menor que los dias que se restan para enviar el email
             if int(date) < dias_anteriores_corte :
+                print("validacion")
                 #entonces a la fecha del corte se le suma el numero dia dias en el mes 
                 date += numero_dias_mes_pasado[1]
 
@@ -70,10 +81,10 @@ class processValidator():
                 dia_envio_email = date - dias_anteriores_corte 
 
                 #se resta uno al mes ya que no estara dentro del mismo mes de la fecha de corte
-                mes_actual = int(mes_actual)
-                mes_actual -= 1
+                mes_anterios = int(mes_actual)
+                mes_anterios -= 1
 
-                fecha_envio_email = f"{año_actual}-{mes_actual}-{dia_envio_email}"
+                fecha_envio_email = f"{año_actual}-{mes_anterios}-{dia_envio_email}"
                 fechas_envios_emails.append(fecha_envio_email)
             else:
                 dia_envio_email = date - dias_anteriores_corte
@@ -102,34 +113,29 @@ class processValidator():
         return fechas_dias
 
 
-
-    def get_date(self,):
-        #obtenemos la culumna de fechas de corte y eliminamos la celda del titulo
-        fechas = self._get_colum("fecha")[1:]
-        fechas = self._evalue_date(fechas, 3)
-        correo = self._get_colum("correo")
-        correos = self._delete_cell("correo",correo)            
-        print(f"""
-        data:
-        fecha envios de correos : {fechas}
-        correos: {correos}
-        """)
-
     def get_validation(self):
         data = {
             "correos": [],
-            "fechas": []
+            "fechas_envio": [],
+            "fecha_corte": []
         }
 
         fechas = self._get_colum("fecha")[1:]
-        fechas = self._evalue_date(fechas, 3)
+
+        fechas_envio_mail = self._evalue_date(fechas, 3)
+        fechas = self._delete_cell("fecha", fechas)
+
         correos = self._get_colum("correo")
         correos = self._delete_cell("correo",correos)
 
-        for correo, fecha in zip(correos, fechas["fechas_envios_emails"]):
-            print(f"{correo}, {fecha}")
-            pass
+        for correo, dia, fecha_envio_mail, fechas in zip(correos, fechas_envio_mail["dias_de_corte"],fechas_envio_mail["fechas_envios_emails"], fechas ):
+            data["correos"].append(correo)
+            data["fechas_envio"].append(fecha_envio_mail)
+            data["fecha_corte"].append(fechas)
+            print(f"{correo}, {fecha_envio_mail}, {fechas} ")
+        print(data)
+        return data
 
         
 doc = processValidator(Path,"clients credito" )
-doc.get_date()
+doc.get_validation()
