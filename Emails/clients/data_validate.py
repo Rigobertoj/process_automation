@@ -37,13 +37,14 @@ class processValidator():
 
     
     def _evalue_date(self, list_dates: list[str], dias: int ) -> dict[list, list]:
-        fechas = {}
         """
-        list_dates : list[str] es una lista d fechas
-        dias: int dia para antes de la fecha de corte
+        param list_dates : list[str] es una lista de fechas
+        param int dia para antes de la fecha de corte
 
         esta funion lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte
+        return dict[fechas_envios_emails, dias_de_corte]
         """
+        fechas = {}
 
         #dias anteriores a la fecha del pago del credito
         dias_anteriores_corte = dias
@@ -107,12 +108,28 @@ class processValidator():
         fechas = self._get_colum("fecha")[1:]
         fechas = self._evalue_date(fechas, 3)
         correo = self._get_colum("correo")
-        correos = self._delete_cell("correo",correo)
+        correos = self._delete_cell("correo",correo)            
         print(f"""
         data:
         fecha envios de correos : {fechas}
         correos: {correos}
         """)
+
+    def get_validation(self):
+        data = {
+            "correos": [],
+            "fechas": []
+        }
+
+        fechas = self._get_colum("fecha")[1:]
+        fechas = self._evalue_date(fechas, 3)
+        correos = self._get_colum("correo")
+        correos = self._delete_cell("correo",correos)
+
+        for correo, fecha in zip(correos, fechas["fechas_envios_emails"]):
+            print(f"{correo}, {fecha}")
+            pass
+
         
 doc = processValidator(Path,"clients credito" )
 doc.get_date()
