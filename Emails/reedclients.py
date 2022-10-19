@@ -1,5 +1,5 @@
 from openpyxl import load_workbook
-Path = "./clients.xlsx"
+Path = "clients/clients.xlsx"
 
 class reedClient():
     
@@ -26,8 +26,8 @@ class reedClient():
         """
         self.Excel_document.save(self.path_file)
 
-clients = reedClient(Path)
-clients.get_shenames()
-clients.set_sheet_name("clients credito")
+# clients = reedClient(Path)
+# clients.get_shenames()
+# clients.set_sheet_name("clients credito")
 
 

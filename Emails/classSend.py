@@ -111,6 +111,10 @@ class enviarEmails():
                 return False
 
 
+    def set_receiver_email(self, receiver_email: str):
+        self.receiver_email = receiver_email
+
+
 if __name__ == "__main__":
     estados_cuenta = enviarEmails(
         sender_email=sender_email, receiver_email=receiver_email, password=password_email,)

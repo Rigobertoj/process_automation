@@ -1,13 +1,10 @@
-from hashlib import new
-
-from numpy import half
 from reedclients import reedClient
-import openpyxl 
 from datetime import date, datetime  as dt
 from calendar import monthrange
+
 #TODO: metodo que nos permita obtener el email 
 
-Path = "./clients.xlsx"
+Path = "./clients/clients.xlsx"
 
 class processValidator():
 
@@ -63,7 +60,6 @@ class processValidator():
 
         #fecha actul
         año_actual, mes_actual, dia_actual = str(self.current_date).split("-")
-        print(f"{año_actual},{mes_actual},{dia_actual}")
 
         #dias que tiene el mes actual 
         numero_dias_mes_pasado = monthrange(int(año_actual), int(mes_actual)- 1)
@@ -73,7 +69,6 @@ class processValidator():
         for date in fechas_corte["dias_de_corte"]:
             #si el dia actual es menor que los dias que se restan para enviar el email
             if int(date) < dias_anteriores_corte :
-                print("validacion")
                 #entonces a la fecha del corte se le suma el numero dia dias en el mes 
                 date += numero_dias_mes_pasado[1]
 
@@ -114,17 +109,24 @@ class processValidator():
 
 
     def get_validation(self):
+        """retorna un diccionarion con listas
+        return correos: list, fechas_envio: list, fecha_corte: list
+        """
         data = {
             "correos": [],
             "fechas_envio": [],
             "fecha_corte": []
         }
 
+        #obtenemos la columna de las fechas
+        #parametrisable primer arg
         fechas = self._get_colum("fecha")[1:]
 
+        #parametrisable segundo arg. obtenemos la validacion de las fechas
         fechas_envio_mail = self._evalue_date(fechas, 3)
         fechas = self._delete_cell("fecha", fechas)
 
+        #parametrisable primer arg correo
         correos = self._get_colum("correo")
         correos = self._delete_cell("correo",correos)
 
@@ -132,9 +134,9 @@ class processValidator():
             data["correos"].append(correo)
             data["fechas_envio"].append(fecha_envio_mail)
             data["fecha_corte"].append(fechas)
-            print(f"{correo}, {fecha_envio_mail}, {fechas} ")
-        print(data)
-        return data
+
+        print(data["fechas_envio"])
+        return data["fechas_envio"]
 
         
 doc = processValidator(Path,"clients credito" )
