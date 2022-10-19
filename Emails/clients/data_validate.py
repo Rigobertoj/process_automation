@@ -12,16 +12,28 @@ Path = "./clients.xlsx"
 class processValidator():
 
     def __init__(self, file_path: str, sheet_name = " ",):
-        self.current_date = date.today()
-        self.dias_anteriores_corte = 3
         # instancia de el doc excel 
         Excel_doc = reedClient(file_path=file_path)
         self.Excel_document = Excel_doc
+        
+        self.current_date = date.today()
+        self.dias_anteriores_corte = 3
 
         # si sheet_name no esta vacio se establece para trabajar con ella 
         if sheet_name != " ":
             self.sheet_name = Excel_doc.set_sheet_name(sheet_name)
-        print(self.current_date)
+
+    def _delete_cell(self, tittle: str, data_list: list):
+        new_lits = [item.value for item in data_list if item.value != tittle]
+        return new_lits
+
+
+    def _get_colum(self, name_colum: str,) -> list:
+        for colum in list(self.sheet_name.columns):
+            for cell in colum:
+                if name_colum in str(cell.value):
+                    column_data = colum
+                    return column_data
 
     
     def _evalue_date(self, list_dates: list[str], dias: int ) -> dict[list, list]:
@@ -43,18 +55,15 @@ class processValidator():
         año_actual, mes_actual, dia_actual = str(self.current_date).split("-")
 
         #dias que tiene el mes actual 
-        numero_dias_mes = monthrange(int(año_actual), int(mes_actual) - 1)
+        numero_dias_mes_pasado = monthrange(int(año_actual), int(mes_actual) - 1)
 
         #lista de los dias donde se enviaran los emails
         fechas_envios_emails = []
-        for date in fechas_corte:
-            print("bucle", date)
+        for date in fechas_corte["dias_de_corte"]:
             #si el dia actual es menor que los dias que se restan para enviar el email
             if int(date) < dias_anteriores_corte :
-                print("validacion")
                 #entonces a la fecha del corte se le suma el numero dia dias en el mes 
-                print(numero_dias_mes)
-                date += numero_dias_mes[1]
+                date += numero_dias_mes_pasado[1]
 
                 # para asi restar el limite de dias antes de enviar el email y salga que es el mes anteriorse
                 dia_envio_email = date - dias_anteriores_corte 
@@ -66,78 +75,44 @@ class processValidator():
                 fecha_envio_email = f"{año_actual}-{mes_actual}-{dia_envio_email}"
                 fechas_envios_emails.append(fecha_envio_email)
             else:
-                 
                 dia_envio_email = date - dias_anteriores_corte
                 fecha_envio_email = f"{año_actual}-{mes_actual}-{dia_envio_email}"
                 fechas_envios_emails.append(fecha_envio_email)
 
         fechas["fechas_envios_emails"] = fechas_envios_emails
-        fechas["fechas_corte"] = fechas_corte
+        fechas["dias_de_corte"] = fechas_corte["dias_de_corte"]
         return fechas
 
 
     def _get_day(self, list_dates: list):
+        fechas_dias = {
+            "fechas_de_corte": list_dates
+        }
         dias = []
-
         #transformamos el valor datetime para que solo nos quede el dia
         for date in list_dates:
             dateS = dt.isoformat(date.value)
             fecha = dateS.split("T")[0]
             dia = fecha.split("-")[-1]
-            print (f"""
-            dia {dia}
-            fecha {fecha}
-            """)
 
             dias.append(int(dia))
 
-        return dias
+        fechas_dias["dias_de_corte"] = dias
+        return fechas_dias
 
-
-    def _get_email(self):
-        print("get email")
-        for column in list(self.sheet_name.columns):
-            for cell in column:
-                if "correo" == cell.value:
-                    print("validacion correos")
-                    correos = column
-
-        correos = [ item.value for item in correos if item.value != "correo"]
-        return correos
-
-        
-        
-
-    def get_fechas_corte(self):
-        """
-        funcion que nos permite obtener las fechas de corte de ccada cliente 
-        """
-
-        # por cada una de las columnas y cada una de las celasda si hay una celda de fecha
-        #se asigna a cutoff_date como una lista 
-        for column in list(self.sheet_name.columns):
-            for cell in column:
-                if "fecha" in cell.value:
-                    self.cutoff_date = list(column)
-
-                    # obtenemos todos los valores menos la celda con el titulo 
-                    self.cutoff_date = self.cutoff_date[1:]
-                break                
-
-        #operamos las fechas para obtener las proximas a vencer
-        self._get_day(self.cutoff_date)
-        self._evalue_date(self.cutoff_date, self.dias_anteriores_corte)
 
 
     def get_date(self,):
-        fechas = self._evalue_date(self.cutoff_date, 3)
-        correo = self._get_email()
+        #obtenemos la culumna de fechas de corte y eliminamos la celda del titulo
+        fechas = self._get_colum("fecha")[1:]
+        fechas = self._evalue_date(fechas, 3)
+        correo = self._get_colum("correo")
+        correos = self._delete_cell("correo",correo)
         print(f"""
         data:
         fecha envios de correos : {fechas}
-        correos: {correo}
+        correos: {correos}
         """)
         
 doc = processValidator(Path,"clients credito" )
-doc.get_fechas_corte()
 doc.get_date()
