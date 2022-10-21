@@ -13,8 +13,11 @@ import requests
 
 
 data = [1,2,3,4,5]
-last_value = data.pop()
-penultimate_value = data.pop()
-print(last_value)
-print(penultimate_value)
-print(data)
+# last_value = data.pop()
+# penultimate_value = data.pop()
+# print(last_value)
+# print(penultimate_value)
+# print(data)
+
+a, b, *c = data
+print(a,b,c)
