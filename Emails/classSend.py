@@ -34,7 +34,7 @@ class enviarEmails():
         file (doc) : documento que se pretende enviar - no obligatorio
 
     clase: 
-        la cual nos permite emitir un emeil de manera automatica a n cantidad de receptores
+        nos permite emitir un emeil de manera automatica a n cantidad de receptores
     """
     def __init__(self,
                  sender_email: str,

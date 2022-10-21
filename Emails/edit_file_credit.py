@@ -13,12 +13,19 @@ class TIIE_file_edit_from_py ():
     atributos: 
         path_file (str) :  ruta por la cual se accedera y modificar el archivo excel
 
-    clase la cual nos permite modificar y editar las secciones donde se hubica la tiie en un doc excel
-    esto nos da la facilidad de poder automatizar este procesos si necesidad de que alguien intervenga
+    class :
+        clase la cual nos permite modificar y editar las secciones donde se hubica la tiie en un doc excel
+
+        se empiza estableciendo la hoja con la cual se va atrabajar (set_shename)
+
         
     """
     def __init__(self, path_file: str):
-
+        """
+        constructor
+        params: 
+            path_file (str) : ruta por la cual se accedera y modificar el archivo excel
+        """
         #se define la ruta a la cual se accede 
         self.path_file = path_file
         # se instancia una clase de openpyxl para cargar el archivo de la ruta
@@ -26,39 +33,64 @@ class TIIE_file_edit_from_py ():
 
 
     #retorna una lista de las hojas existentes en un documento en excel
-    def get_shenames(self) -> list:
-        """retorna una lista de las hojas existentes en el documento en excel"""
+    def get_sheet_names(self) -> list:
+        """
+        metod:
+            nos permite visualizar toda la lista de hojas de trabajo que tengamos en nuestro archivo excel
+
+        retorn list : lista de las hojas existentes en el documento en excel
+        
+        """
         print(self.Excel_document.sheetnames)
         return self.Excel_document.sheetnames
 
 
-    #establece la hoja con la que se va atrabajar 
-    def set_shenames (self, shenames: str):
-        self.shenames = self.Excel_document[shenames]
+    #establece la hoja con la que se va atrabajar
+    def set_sheet_name(self, sheet_name: str):
+        """
+        params : 
+            sheet_name (str): nombre de la hoja con la cual se quiere trabajar
+
+        metod: 
+            establace la hoja con la cual se va atrabar y tratar los datos
+        """
+
+        self.sheet_names = self.Excel_document[sheet_name]
 
 
     #retorna el mismo elemento pero convertido en un estring
     def conver_string(self,objeto_a_convertir):
+        """
+        params:
+            objeto_a_convertir (any) : valores que se pretenden convertir en strings
+
+        metod:
+            que nos permite convertir un elemento a un string
+        """
         return f"{objeto_a_convertir}"
 
 
 
      #retorna del objeto CELL la posicion donde esta la celda TIIE en una cadena de texto para su manipulacion 
+
     def _get_cell_as_string(self,object):
+        """
+        
+        """
         element = self.conver_string(object)
         list_with_cell = element.split(".")
         cell = list_with_cell[1][0:-1]
         return cell
 
 
-    #retorna un diccionari con un valor y una lista
+    #retorna un diccionario con un valor y una lista
     #el valor es la celda que almacena la columna de la TIIE
     def _get_column_TIIE(self): 
         self.colum = {
             "value": 0,
             "list": list
         }
-        for row in list(self.shenames.rows):
+        for row in list(self.sheet_names.rows):
             for cell in row:
                 if cell.value == "TIIE":
                     self.colum["list"] = row
@@ -89,7 +121,7 @@ class TIIE_file_edit_from_py ():
         index_colum_TIIE = self._get_index_column_TIIE()
         values = []
         Cells_empty = []
-        for cell in list(self.shenames.columns)[index_colum_TIIE["index"]]:
+        for cell in list(self.sheet_names.columns)[index_colum_TIIE["index"]]:
             if cell.value != None:
                 values.append(cell)
             else:
@@ -118,13 +150,13 @@ class TIIE_file_edit_from_py ():
         
     def insert_TIIE_in_client(self,value: float, path_to_save: str):
         cell = self.get_next_cell_empty()
-        self.shenames[cell] = value
+        self.sheet_names[cell] = value
         self.Excel_document.save(self.path_file)
-        print(self.shenames[cell].value)
+        print(self.sheet_names[cell].value)
 
 
 client = TIIE_file_edit_from_py(PATH)
-client.set_shenames("Alejandro Ochoa")
+client.set_sheet_name("Alejandro Ochoa")
 
 # client.conver_string(1)
 cord = client.insert_TIIE_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
