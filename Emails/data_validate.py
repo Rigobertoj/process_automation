@@ -44,7 +44,7 @@ class processValidator():
     
     def _evalue_date(self, list_dates: list[str], dias: int ) -> dict[list, list]:
         """
-        param list_dates : list[str] es una lista de fechas
+        param list_dates : list[str] es una lista de fechas \n
         param int dia para antes de la fecha de corte
 
         esta funion lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte
