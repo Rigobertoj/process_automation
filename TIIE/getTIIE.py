@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import requests
 import dotenv
 import os
@@ -7,7 +8,7 @@ import requests
 config = dotenv.dotenv_values("../env/.env")
 TOKEN = config.get("TOKEN_TIIE")
 URL = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43783/datos"
-def get_series_Tiie():
+def get_series_Tiie() -> json:
     """
     obtemos todos los datos de la API de banxico, sobre los valores de la TIIE 
     
@@ -57,7 +58,7 @@ def fecha(fecha: str | datetime) -> list[str, str, str]:
 
     param fecha : fecha la cual se quiere descoponer
     
-    return list : una lista de valores de dia, mes y año separados en ese orden
+    return list : una lista de valores de dia : int, mes : int y año : int separados en ese orden
     """
 
     # si fecha no es del tipo string la convertimos en una cade 
@@ -89,7 +90,12 @@ def fecha(fecha: str | datetime) -> list[str, str, str]:
 
 
     
-def TIIE_Actual():
+def TIIE_Actual() -> dict:
+    """
+    function que nos permite obtener el valor de la tiee actual atraves de la validacion de las fechas
+
+    return dict : diccionario con claves, fecha : str, dato : int
+    """
     #obtenemos las fechas actuales
     dia_actual = datetime.today()
     dia_actual, mes_actual, *_ = fecha(dia_actual)
@@ -113,4 +119,3 @@ def TIIE_Actual():
 if __name__ == "__main__":
     value = TIIE_Actual()
     print(value)
-    # print(TOKEN)
