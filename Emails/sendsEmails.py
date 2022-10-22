@@ -3,7 +3,7 @@ from data_validate import processValidator
 from classSend import enviarEmails
 
 path_file_excel = "C:/Users/Promotora/rigoberto/python/process_automation/Emails/clients/clients.xlsx"
-config = dotenv.dotenv_values("../../env/.env")
+config = dotenv.dotenv_values("../env/.env")
 
 class EnviarEmails():
     def __init__(self, sender_email: str, password_email: str,path_file :str, sheet_name:str ,asunto = " ", mensaje =" ", path_excel_doc = " "):
