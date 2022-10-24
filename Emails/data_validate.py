@@ -1,18 +1,41 @@
 from reedclients import reedClient
 from datetime import date, datetime  as dt
 from calendar import monthrange
+from utils.day import day
 
 #TODO: metodo que nos permita obtener el email 
 
 Path = "./clients/clients.xlsx"
 
-class processValidator():
 
-    def __init__(self, file_path: str, sheet_name = " ",):
+class processValidator():
+    """
+    atributos:
+        Excel_document ( reedclients ) : instancia del documento excel para su manipulacion 
+        sheet_name ( str ) : nombre de la hoja de excel la cual queremos procesar
+        current_date ( datetime ) : datetime para obtener el dia actual 
+        dias_anteriores_corte ( int ) : dias a evaluar para antes del corte para el envio del email
+
+    explicacion : 
+        clase que nos permite validar cual sera el dia que se devera enviar un email evaluando x cantidad de dias antes de su corte del mes
+    """
+
+
+    def __init__(self, file_path: str, sheet_name: str = " ",) -> None:
+        """
+        params: 
+            file_path ( str ) : Ruta del documento excel
+            sheet_name ( str ) : opccional. Nombre de la hoja a procesar.
+
+        explicacion :
+            contructor que nos permite instanciar el documento excel junto a la hoja que queremos procesar
+        """
+
         # instancia de el doc excel 
         Excel_doc = reedClient(file_path=file_path)
         self.Excel_document = Excel_doc
         
+        #atributo del dia actual
         self.current_date = date.today()
         self.dias_anteriores_corte = 3
 
@@ -20,35 +43,17 @@ class processValidator():
         if sheet_name != " ":
             self.sheet_name = Excel_doc.set_sheet_name(sheet_name)
 
-    def _delete_cell(self, tittle: str, data_list: list):
-        """Metodo que nos permite eliminar una cellda de la columna
-        utilicece para eliminar el titulo de la columna
-        """
-        new_lits = [item.value for item in data_list if item.value != tittle]
-        return new_lits
-
-
-    def _get_colum(self, name_colum: str,) -> list:
-        """ metodo que nos permite obtener cualquier columna de la hoja de excel"""
-        for colum in list(self.sheet_name.columns):
-            for cell in colum:
-                if name_colum in str(cell.value):
-                    column_celda = list(colum)
-        return column_celda
-        
-    
-    def _get_values(self, column:list) -> list:
-        """retorna una lista con los valores de la columna que se le introduscan"""
-        column_value = [cell.value  for cell in column]
-        return column_value
     
     def _evalue_date(self, list_dates: list[str], dias: int ) -> dict[list, list]:
         """
-        param list_dates : list[str] es una lista de fechas \n
-        param int dia para antes de la fecha de corte
+        param :
+            list_dates ( list[str] ) : es una lista de fechas en strings
+            dias ( int ) : dias antes de la fecha de corte
 
-        esta funion lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte
-        return dict[fechas_envios_emails, dias_de_corte]
+        explicacion :
+            esta funion lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte. \n 
+        
+        return dict[fechas_envios_emails, dias_de_corte] 
         """
         fechas = {}
 
@@ -56,7 +61,7 @@ class processValidator():
         dias_anteriores_corte = dias
         
         #los dias de las fechas de corte de cada cliente 
-        fechas_corte = self._get_day(list_dates)
+        fechas_corte = day.get_days(list_dates=list_dates)
 
         #fecha actul
         año_actual, mes_actual, dia_actual = str(self.current_date).split("-")
@@ -108,9 +113,10 @@ class processValidator():
         return fechas_dias
 
 
-    def get_validation(self):
-        """retorna un diccionarion con listas
-        return correos: list, fechas_envio: list, fecha_corte: list
+    def get_validation(self) -> list:
+        """
+        explicacion: 
+            pendiente a testeo 
         """
         data = {
             "correos": [],
@@ -119,16 +125,16 @@ class processValidator():
         }
 
         #obtenemos la columna de las fechas
-        #parametrisable primer arg
-        fechas = self._get_colum("fecha")[1:]
+        fechas = self.Excel_document._get_colum("fecha")[1:]
 
-        #parametrisable segundo arg. obtenemos la validacion de las fechas
+        # obtenemos la validacion de las fechas
         fechas_envio_mail = self._evalue_date(fechas, 3)
-        fechas = self._delete_cell("fecha", fechas)
+        fechas = self.Excel_document._delete_cell("fecha", fechas) #--
 
         #parametrisable primer arg correo
-        correos = self._get_colum("correo")
-        correos = self._delete_cell("correo",correos)
+        correos = self.Excel_document._get_colum("correo")
+        correos = self.Excel_document._delete_cell("correo",correos) #--
+
 
         for correo, dia, fecha_envio_mail, fechas in zip(correos, fechas_envio_mail["dias_de_corte"],fechas_envio_mail["fechas_envios_emails"], fechas ):
             data["correos"].append(correo)
@@ -138,6 +144,8 @@ class processValidator():
         print(data["fechas_envio"])
         return data["fechas_envio"]
 
-        
-doc = processValidator(Path,"clients credito" )
-doc.get_validation()
+
+
+if __name__ == "__main__":
+    doc = processValidator(Path,"clients credito" )
+    doc.get_validation()
