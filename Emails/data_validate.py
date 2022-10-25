@@ -51,7 +51,7 @@ class processValidator():
             dias ( int ) : dias antes de la fecha de corte
 
         explicacion :
-            esta funion lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte. \n 
+            este metodo lo que nos permite es retornar la fecha de envio de un email dependiendo de los dias que se desee de enviar entes de la fecha de corte. \n 
         
         return dict[fechas_envios_emails, dias_de_corte] 
         """
@@ -61,8 +61,10 @@ class processValidator():
         dias_anteriores_corte = dias
         
         #los dias de las fechas de corte de cada cliente 
+        print(f"lista de fechas {list_dates}")
+        fechas_corte = day()
         fechas_corte = day.get_days(list_dates=list_dates)
-
+        print(f" fechas de corte {fechas_corte}")
         #fecha actul
         año_actual, mes_actual, dia_actual = str(self.current_date).split("-")
 
@@ -96,6 +98,7 @@ class processValidator():
         return fechas
 
 
+    #TODO: remover el metodo para una mejor arquitectura de la clase 
     def _get_day(self, list_dates: list):
         fechas_dias = {
             "fechas_de_corte": list_dates
@@ -112,7 +115,7 @@ class processValidator():
         fechas_dias["dias_de_corte"] = dias
         return fechas_dias
 
-
+    #TODO: realizar la doc del metodo 
     def get_validation(self) -> list:
         """
         explicacion: 
@@ -125,15 +128,15 @@ class processValidator():
         }
 
         #obtenemos la columna de las fechas
-        fechas = self.Excel_document._get_colum("fecha")[1:]
+        fechas = self.Excel_document.get_colum("fecha")[1:]
 
         # obtenemos la validacion de las fechas
         fechas_envio_mail = self._evalue_date(fechas, 3)
-        fechas = self.Excel_document._delete_cell("fecha", fechas) #--
+        fechas = self.Excel_document.delete_cell("fecha", fechas) #--
 
         #parametrisable primer arg correo
-        correos = self.Excel_document._get_colum("correo")
-        correos = self.Excel_document._delete_cell("correo",correos) #--
+        correos = self.Excel_document.get_colum("correo")
+        correos = self.Excel_document.delete_cell("correo",correos) #--
 
 
         for correo, dia, fecha_envio_mail, fechas in zip(correos, fechas_envio_mail["dias_de_corte"],fechas_envio_mail["fechas_envios_emails"], fechas ):
