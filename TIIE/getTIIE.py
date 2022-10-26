@@ -4,9 +4,10 @@ import requests
 import dotenv
 import os
 
+
 import requests
-config = dotenv.dotenv_values("../env/.env")
-TOKEN = config.get("TOKEN_TIIE")
+config = dotenv.load_dotenv("../env/.env")
+# TOKEN = config.get("TOKEN_TIIE")
 URL = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43783/datos"
 def get_series_Tiie() -> json:
     """
@@ -17,11 +18,11 @@ def get_series_Tiie() -> json:
     
     try:
         #se hace la peticion a la url 
-        response = requests.get(URL, headers={"Bmx-Token": TOKEN})
+        response = requests.get(URL, headers={"Bmx-Token": ""})
         data = response.json()
     except requests.HTTPError as httpError:
         #si da algun valor https se imprime por pantalla 
-        print(f"HTTP error {response.status_code}- {httpError}")
+        print(f"HTTP error {response.status_code} - {httpError}")
 
     except Exception as error:
         print(error)
@@ -97,8 +98,8 @@ def TIIE_Actual() -> dict:
     return dict : diccionario con claves, fecha : str, dato : int
     """
     #obtenemos las fechas actuales
-    dia_actual = datetime.today()
-    dia_actual, mes_actual, *_ = fecha(dia_actual)
+    fecha_actual = datetime.today()
+    año_actual, mes_actual, dia_actual= fecha(fecha_actual)
 
     #obtemos las ultimas dos TIIE
     ultima_tiie, penultima_tiie  = ultimas_dos_TIIE()
@@ -107,7 +108,7 @@ def TIIE_Actual() -> dict:
     dia_ultima_tiie, mes_ultima_tiie, *_ = fecha(ultima_tiie["fecha"])
     dia_penultima_tiie, mes_penultima_tiie, *_ = fecha(penultima_tiie["fecha"])
 
-    if mes_penultima_tiie <= mes_actual & dia_ultima_tiie <= dia_actual :
+    if mes_ultima_tiie <= mes_actual and dia_ultima_tiie <= dia_actual :
         return ultima_tiie
 
     return penultima_tiie
@@ -117,5 +118,6 @@ def TIIE_Actual() -> dict:
 
 
 if __name__ == "__main__":
+    print(config)
     value = TIIE_Actual()
     print(value)
