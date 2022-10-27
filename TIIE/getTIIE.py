@@ -6,22 +6,22 @@ import os
 
 
 import requests
-config = dotenv.load_dotenv("../env/.env")
-# TOKEN = config.get("TOKEN_TIIE")
+config = dotenv.dotenv_values("../env/.env")
+TOKEN = config.get("TOKEN_TIIE")
 URL = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43783/datos"
 def get_series_Tiie() -> json:
     """
-    obtemos todos los datos de la API de banxico, sobre los valores de la TIIE 
-    
-    return json : este tiene los datos de la API de banxico 
+    obtemos todos los datos de la API de banxico, sobre los valores de la TIIE
+
+    return json : este tiene los datos de la API de banxico
     """
-    
+
     try:
-        #se hace la peticion a la url 
-        response = requests.get(URL, headers={"Bmx-Token": ""})
+        #se hace la peticion a la url
+        response = requests.get(URL, headers={"Bmx-Token": TOKEN})
         data = response.json()
     except requests.HTTPError as httpError:
-        #si da algun valor https se imprime por pantalla 
+        #si da algun valor https se imprime por pantalla
         print(f"HTTP error {response.status_code} - {httpError}")
 
     except Exception as error:
@@ -31,7 +31,7 @@ def get_series_Tiie() -> json:
         print("success")
 
     return data
-    
+
 
 def ultimas_dos_TIIE() -> list:
     """
@@ -41,13 +41,13 @@ def ultimas_dos_TIIE() -> list:
     return list : lista con los valores de la ultima y penultima tiie
     """
 
-    # obtenemos la data de la API  
+    # obtenemos la data de la API
     data = get_series_Tiie()
 
     #extreamos los datos de la TIIE
     TIIE = data["bmx"]["series"][0]["datos"]
 
-    #extraemos los dos ultimos datos 
+    #extraemos los dos ultimos datos
     ultima_tiie = TIIE.pop()
     penultima_tiie = TIIE.pop()
 
@@ -58,19 +58,19 @@ def fecha(fecha: str | datetime) -> list[str, str, str]:
     descopone la fecha introducida en dia, mes y año
 
     param fecha : fecha la cual se quiere descoponer
-    
+
     return list : una lista de valores de dia : int, mes : int y año : int separados en ese orden
     """
 
-    # si fecha no es del tipo string la convertimos en una cade 
+    # si fecha no es del tipo string la convertimos en una cade
     if(type(fecha) != str):
         fecha = str(fecha)
 
-    
+
     if " " in fecha:
         #si tiene timepo y fecha esta se dividen
         fecha = fecha.split(" ")
-        #asignamos la parte de la fecha 
+        #asignamos la parte de la fecha
         fecha = fecha[0]
 
     #si esta separada por - las seperamos por -
@@ -81,7 +81,7 @@ def fecha(fecha: str | datetime) -> list[str, str, str]:
         año = int(año)
         return [dia, mes, año]
 
-    #si esta separada por / las seperamos por /   
+    #si esta separada por / las seperamos por /
     if "/" in fecha:
         dia, mes, año, *resto = fecha.split("/")
         dia =int(dia)
@@ -90,7 +90,7 @@ def fecha(fecha: str | datetime) -> list[str, str, str]:
         return [dia, mes, año]
 
 
-    
+
 def TIIE_Actual() -> dict:
     """
     function que nos permite obtener el valor de la tiee actual atraves de la validacion de las fechas
@@ -103,7 +103,7 @@ def TIIE_Actual() -> dict:
 
     #obtemos las ultimas dos TIIE
     ultima_tiie, penultima_tiie  = ultimas_dos_TIIE()
-    
+
     #desempaquetamos el dia y mes de ambas tiie
     dia_ultima_tiie, mes_ultima_tiie, *_ = fecha(ultima_tiie["fecha"])
     dia_penultima_tiie, mes_penultima_tiie, *_ = fecha(penultima_tiie["fecha"])
@@ -112,12 +112,12 @@ def TIIE_Actual() -> dict:
         return ultima_tiie
 
     return penultima_tiie
-    
+
 
 
 
 
 if __name__ == "__main__":
-    print(config)
+    print(TOKEN)
     value = TIIE_Actual()
     print(value)

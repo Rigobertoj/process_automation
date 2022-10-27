@@ -23,7 +23,7 @@ class insert_data():
         client.set_sheet_name(sheet_name)
         print(client.sheet_names)
         "insert the tiie in the document excel file confirm to open the file and view the data en column with the name TIIE "
-        client.insert_TIIE_in_client(TIIE)
+        client.insert_value_in_client(TIIE)
 
 
 if __name__ == "__main__":

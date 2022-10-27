@@ -11,10 +11,10 @@ PATH = "./Control de crédito mensual .xlsx"
 # clase  que nos permite modificar las celdas de TIIE
 class TIIE_file_edit_from_py ():
     """
-    atributos: 
+    ?atributos: 
         path_file (str) :  ruta por la cual se accedera y modificar el archivo excel
         Excel_document : instancia que permite manipular y modificar el doc excel
-    class :
+    ?class :
         clase la cual nos permite modificar y editar las secciones donde se hubica la tiie en un doc excel
 
         se empiza estableciendo la hoja con la cual se va atrabajar (set_shename)
@@ -27,7 +27,7 @@ class TIIE_file_edit_from_py ():
         params: 
             path_file (str) : ruta por la cual se accedera y modificar el archivo excel
         """
-        #se define la ruta a la cual se accede 
+        # se define la ruta a la cual se accede 
         self.path_file = path_file
         # se instancia una clase de openpyxl para cargar el archivo de la ruta
         self.Excel_document = openpyxl.load_workbook(path_file)
@@ -106,33 +106,40 @@ class TIIE_file_edit_from_py ():
                 if cell.value == name_column:
 
                     #asignamos los valores al diccionario
-                    self.colum["list"] = row
-                    self.colum["value"] = cell
+                    self.colum["list"] = row # fila donde se encuentra dicha valor
+                    self.colum["value"] = cell # valor que se busca en el parametro
 
         return self.colum
 
 
     #retorna un diccionario con un indice
     #EL INDICE es la posicon de la columna donde esta la TIIE
-    def get_index_column_TIIE(self):
+    def get_index_column(self, name_column: str):
         self.data_colum = {
             "index": int,
         }
+        # obtenemos la fila donde se encuentra el valor que se busca
+        row = self.get_row(name_column=name_column)
+        
+        #del diccionario obtenemos los valores de la lista
+        value_list = list(row["list"])
+        print(value_list)
 
-        row = self.get_row("TIIE")
-        value_list = row["list"]
+        
+        #iteramos por cada indice en la lista de celdas
         for i in range(len(value_list)):
             if(row["value"] == value_list[i]):
                 self.data_colum["index"] = i
-
+            
+        print(self.data_colum)
         return self.data_colum
 
     # retorna dos listas
     # LA PRIMERA LIST es una lista de celdas las cuales tiene un valor asignado de TIIE
     # LA SEGUNDA LIST es una lista con las celdas las cuales no tiene un valor asignado
 
-    def get_cell_TIIE(self):
-        index_colum_TIIE = self.get_index_column_TIIE()
+    def get_cell(self):
+        index_colum_TIIE = self.get_index_column("TIIE")
         values = []
         Cells_empty = []
         for cell in list(self.sheet_names.columns)[index_colum_TIIE["index"]]:
@@ -148,10 +155,10 @@ class TIIE_file_edit_from_py ():
 
         return lists
 
-        #retorna la siguiente celda en la clumna de las TIIE la cual este vacia
-        
+
+        #retorna la siguiente celda en la clumna la cual este vacia        
     def get_next_cell_empty(self):
-        lists_cell_TIIE = self.get_cell_TIIE()
+        lists_cell_TIIE = self.get_cell()
         list_cell_with_values_TIIE = lists_cell_TIIE["Cells_whit_TIIE"]
         last_cell_with_TIIE = list_cell_with_values_TIIE[-1]
         cell = self.get_cell_as_string(last_cell_with_TIIE)
@@ -162,7 +169,7 @@ class TIIE_file_edit_from_py ():
 
         # inserta un valor float en la siguiente celda de la column TIIE 
         
-    def insert_TIIE_in_client(self,value: float, path_to_save: str = " "):
+    def insert_value_in_client(self,value: float, path_to_save: str = " "):
         cell = self.get_next_cell_empty()
         self.sheet_names[cell] = value
         self.Excel_document.save(self.path_file)
@@ -174,7 +181,7 @@ if __name__ == "__main__":
     client.set_sheet_name("Alejandro Ochoa")
   
     # client.conver_string(1)
-    cord = client.insert_TIIE_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
+    cord = client.insert_value_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
     value = conver_value(12)
     tipe = value.conver_string()
     print(type(tipe))
