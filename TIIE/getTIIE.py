@@ -114,14 +114,37 @@ def TIIE_Actual() -> dict:
 
 
 def convert_datetime(data):
+    """convierte obtiene la fecha del objeto data y la transforma de un objeto datatime
+
+    Args:
+        data (str): diccionarion con una clave feccha y un avlor en fecha str
+
+    Returns:
+        dict: diccionario con el mismo objeto introducido solamente que se cambia el formato de la fecha a datetime
+    """
+    #obtenemos el valor fecha 
     fecha = data["fecha"]
+
+    #desempaquetamos la fecha y la asignamos a distinras variables
     dia, mes, año = fecha.split("/")
+    
+    #creamos el tipo datatime 
     fecha_dataTime = datetime.strptime(f"{año}-{mes}-{dia}", '%Y-%m-%d')
+    #reasignamos el valor de fecha en el objeto original 
     data["fecha"] = fecha_dataTime
     return data
 
 
 def TIIE_por_fecha (fecha: str | datetime):
+    """funcion que me permite obtener la TIIE mas cercana a la fecha introducida
+
+    Args:
+        fecha (str | datetime): fecha con la cual se evaluara y obtendra ell valor mas cercano a la fecha introducida
+
+    Returns:
+        dict : diccionario con el la clave fecha  y dato de la TIIE  mas cercana a la fecha introducida
+    """
+
     #retorna el valor de la TIIE en base a una reference de fechas
 
     #si fecha es del tipo str se convierte a datetime
@@ -137,10 +160,13 @@ def TIIE_por_fecha (fecha: str | datetime):
     #obtenemos la data de la TIIE
     TIIE = data["bmx"]["series"][0]["datos"]
 
+    #convertimos las fechas str a datetime
     TIIE_f = list(map(convert_datetime, TIIE))
 
+    #obtenemos las fechas que cumplen la condicion
     value = list(filter(lambda x: x["fecha"] <= fecha, TIIE_f))
-    print(value[-1])
+    #retornamos el ultimo valor que cumple con la condicion
+    return value[-1]
 
 
 
