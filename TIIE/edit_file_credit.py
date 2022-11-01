@@ -11,7 +11,7 @@ PATH = "./Control de crédito mensual .xlsx"
 # clase  que nos permite modificar las celdas de TIIE
 class TIIE_file_edit_from_py ():
     """
-    ?atributos: 
+    ?atributos:
         path_file (str) :  ruta por la cual se accedera y modificar el archivo excel
         Excel_document : instancia que permite manipular y modificar el doc excel
     ?class :
@@ -19,15 +19,15 @@ class TIIE_file_edit_from_py ():
 
         se empiza estableciendo la hoja con la cual se va atrabajar (set_shename)
 
-        
+
     """
     def __init__(self, path_file: str):
         """
         constructor
-        params: 
+        params:
             path_file (str) : ruta por la cual se accedera y modificar el archivo excel
         """
-        # se define la ruta a la cual se accede 
+        # se define la ruta a la cual se accede
         self.path_file = path_file
         # se instancia una clase de openpyxl para cargar el archivo de la ruta
         self.Excel_document = openpyxl.load_workbook(path_file)
@@ -41,7 +41,7 @@ class TIIE_file_edit_from_py ():
             nos permite visualizar toda la lista de hojas de trabajo que tengamos en nuestro archivo excel
 
         retorn list : lista de las hojas existentes en el documento en excel
-        
+
         """
         print(self.Excel_document.sheetnames)
         return self.Excel_document.sheetnames
@@ -50,31 +50,31 @@ class TIIE_file_edit_from_py ():
     #establece la hoja con la que se va atrabajar
     def set_sheet_name(self, sheet_name: str):
         """
-        params : 
+        params :
             sheet_name (str): nombre de la hoja con la cual se quiere trabajar
 
-        metod: 
+        metod:
             establace la hoja con la cual se va atrabar y tratar los datos
         """
 
         self.sheet_names = self.Excel_document[sheet_name]
 
 
-    #retorna del objeto CELL la posicion donde esta la celda TIIE en una cadena de texto para su manipulacion 
+    #retorna del objeto CELL la posicion donde esta la celda TIIE en una cadena de texto para su manipulacion
     def get_cell_as_string(self,cell_object):
         """
         params:
             cell (<Cell>) : es el tipo de dato cell que biene en openpyxl
 
         description:
-            nos permite retornar del objeto CELL la cordenada o posicion del objeto eliminando el tipo, nombre de la hoja y los signos <> 
+            nos permite retornar del objeto CELL la cordenada o posicion del objeto eliminando el tipo, nombre de la hoja y los signos <>
         """
         #?objeto cell -> <Cell 'sheet name'.H15>
 
-        #convertimos en un estring el objeto CELL 
+        #convertimos en un estring el objeto CELL
         element = self.conver_value.conver_string(cell_object)
-        
-        #separamos la cadena apartir del punto que viene en la cadena 
+
+        #separamos la cadena apartir del punto que viene en la cadena
         list_with_cell = element.split(".")
 
         #retornamos el segundo elemento que es la celda y quitamos el signo >
@@ -90,9 +90,9 @@ class TIIE_file_edit_from_py ():
         params:
             name_column (str) : nombre de la culumna la cual bamos a buscar
 
-        description: 
-            nos permite buscar una columna a partir de su nombre o algun dato string que este en ella 
-        """ 
+        description:
+            nos permite buscar una columna a partir de su nombre en una fila o algun dato string que este en ella
+        """
         self.colum = {
             "value": 0,
             "list": list
@@ -102,11 +102,11 @@ class TIIE_file_edit_from_py ():
             #iteramos por cada cellda en la fila
             for cell in row:
 
-                #si el valor de la cellda es igual al dato que estamos buscando 
+                #si el valor de la cellda es igual al dato que estamos buscando
                 if cell.value == name_column:
 
                     #asignamos los valores al diccionario
-                    self.colum["list"] = row # fila donde se encuentra dicha valor
+                    self.colum["list"] = list(row) # fila donde se encuentra dicha valor
                     self.colum["value"] = cell # valor que se busca en el parametro
 
         return self.colum
@@ -115,22 +115,29 @@ class TIIE_file_edit_from_py ():
     #retorna un diccionario con un indice
     #EL INDICE es la posicon de la columna donde esta la TIIE
     def get_index_column(self, name_column: str):
+        """
+        params:
+            name_column (str): titulo de la columna
+
+        description:
+            este metodo lo que nos mermite es obtener el indice donde se encuentra la columna es decir si la saber si la columna es la primera, segunda, tercera etc.
+        """
         self.data_colum = {
             "index": int,
         }
         # obtenemos la fila donde se encuentra el valor que se busca
         row = self.get_row(name_column=name_column)
-        
+
         #del diccionario obtenemos los valores de la lista
         value_list = list(row["list"])
         print(value_list)
 
-        
+
         #iteramos por cada indice en la lista de celdas
         for i in range(len(value_list)):
             if(row["value"] == value_list[i]):
                 self.data_colum["index"] = i
-            
+
         print(self.data_colum)
         return self.data_colum
 
@@ -138,8 +145,15 @@ class TIIE_file_edit_from_py ():
     # LA PRIMERA LIST es una lista de celdas las cuales tiene un valor asignado de TIIE
     # LA SEGUNDA LIST es una lista con las celdas las cuales no tiene un valor asignado
 
-    def get_cell(self):
-        index_colum_TIIE = self.get_index_column("TIIE")
+    def get_cells(self, name_column: str):
+        """
+        params: 
+            name_column (str): nombre de la columna que queremos extraer sus valores
+
+        description:
+            metodo que nos permite obtener una lista con las celdas que tienen los valores de la columna la cual buscamos
+        """
+        index_colum_TIIE = self.get_index_column(name_column)
         values = []
         Cells_empty = []
         for cell in list(self.sheet_names.columns)[index_colum_TIIE["index"]]:
@@ -147,43 +161,66 @@ class TIIE_file_edit_from_py ():
                 values.append(cell)
             else:
                 Cells_empty.append(cell)
-        
+
         lists = {
-        "Cells_whit_TIIE":values,
+        "Cells_whit_value":values,
         "Cells_empty":Cells_empty
-        } 
+        }
 
         return lists
 
 
-        #retorna la siguiente celda en la clumna la cual este vacia        
-    def get_next_cell_empty(self):
-        lists_cell_TIIE = self.get_cell()
-        list_cell_with_values_TIIE = lists_cell_TIIE["Cells_whit_TIIE"]
-        last_cell_with_TIIE = list_cell_with_values_TIIE[-1]
-        cell = self.get_cell_as_string(last_cell_with_TIIE)
+        #retorna la siguiente celda en la clumna la cual este vacia
+    def get_next_cell_empty(self, name_column: str):
+        """
+        params:
+            name_column (str) : nombre de la columa de la cual queremo obtener la ssiguinete celda vacia
+
+            description :
+                este metodo lp qie nos propociona es obtener la siguinete celda vacia en una columna 
+        """
+        #obtenemos las la lista de celldas de la columna
+        lists_cell_value = self.get_cells(name_column)["Cells_whit_value"]
+        #obtenemos la ultima cellda que tiene un valor
+        last_cell_with_value = lists_cell_value[-1]
+
+        #obtenemo la ultima celda que tiene un valor
+        cell = self.get_cell_as_string(last_cell_with_value)
+        print(f" empty cell {cell}")
+
+        #desempaquetamos la el string cell
         [letter ,cord_x, cord_y] = cell
+
+        #despues a el valor que tiene la columna le sumamos uno
+        #esto para que tenga el valor de siguiente celda vacia
         cord_y = int(cord_y)+1
+
+        #volvemos ajuntar todo para retornarlo
         cell = letter + cord_x + str(cord_y)
         return cell
 
-        # inserta un valor float en la siguiente celda de la column TIIE 
-        
-    def insert_value_in_client(self,value: float, path_to_save: str = " "):
-        cell = self.get_next_cell_empty()
+        # inserta un valor float en la siguiente celda de la column TIIE
+
+    def insert_value_in_client(self,value: float,):
+
+        cell = self.get_next_cell_empty("TIIE")
         self.sheet_names[cell] = value
         self.Excel_document.save(self.path_file)
+
         print(self.sheet_names[cell].value)
 
 
 if __name__ == "__main__":
     client = TIIE_file_edit_from_py(PATH)
     client.set_sheet_name("Alejandro Ochoa")
-  
-    # client.conver_string(1)
-    cord = client.insert_value_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
-    value = conver_value(12)
-    tipe = value.conver_string()
-    print(type(tipe))
 
+    # # client.conver_string(1)
+    # cord = client.insert_value_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
+    # value = conver_value(12)
+    # tipe = value.conver_string()
+    # print(type(tipe))
+
+    
+    colum = client.get_next_cell_empty("TIIE")
+    print(colum)
 

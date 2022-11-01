@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from typing import final
 import requests
 import dotenv
 import os
@@ -27,8 +28,6 @@ def get_series_Tiie() -> json:
     except Exception as error:
         print(error)
 
-    else:
-        print("success")
 
     return data
 
@@ -114,10 +113,38 @@ def TIIE_Actual() -> dict:
     return penultima_tiie
 
 
+def convert_datetime(data):
+    fecha = data["fecha"]
+    dia, mes, año = fecha.split("/")
+    fecha_dataTime = datetime.strptime(f"{año}-{mes}-{dia}", '%Y-%m-%d')
+    data["fecha"] = fecha_dataTime
+    return data
+
+
+def TIIE_por_fecha (fecha: str | datetime):
+    #retorna el valor de la TIIE en base a una reference de fechas
+
+    #si fecha es del tipo str se convierte a datetime
+    if type(fecha) == str:
+        print("validacion")
+        dia, mes, año = fecha.split("/")
+        print(año)
+        fecha = datetime.strptime(f"{año}-{mes}-{dia}", '%Y-%m-%d')
+    
+    #obtenemos la data de las series
+    data = get_series_Tiie()
+    
+    #obtenemos la data de la TIIE
+    TIIE = data["bmx"]["series"][0]["datos"]
+
+    TIIE_f = list(map(convert_datetime, TIIE))
+
+    value = list(filter(lambda x: x["fecha"] <= fecha, TIIE_f))
+    print(value[-1])
 
 
 
 if __name__ == "__main__":
-    print(TOKEN)
-    value = TIIE_Actual()
+    fecha_ = "06/04/2022"
+    value = TIIE_por_fecha(fecha_)
     print(value)
