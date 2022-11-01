@@ -1,5 +1,5 @@
 import dotenv
-from data_validate import processValidator
+from data_v import processValidator
 from classSend import enviarEmails
 
 path_file_excel = "C:/Users/Promotora/rigoberto/python/process_automation/Emails/clients/clients.xlsx"
@@ -11,7 +11,7 @@ class EnviarEmails():
         excel_doc = processValidator(file_path=path_file, sheet_name=sheet_name)
         
         print(excel_doc.current_date)
-        data = excel_doc.get_validation()
+        data = excel_doc.validacion_de_fecha()
         self.data = data 
         self.sender_email = sender_email
         self.password = password_email
