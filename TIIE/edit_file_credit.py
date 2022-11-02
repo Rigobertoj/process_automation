@@ -92,6 +92,8 @@ class TIIE_file_edit_from_py ():
 
         description:
             nos permite buscar una columna a partir de su nombre en una fila o algun dato string que este en ella
+
+        return dict : dict[value, list] list -> lista con la fila donde se encuentra el valor por el cuall buscamos la fila, value -> celda donde esta diccho valor
         """
         self.colum = {
             "value": 0,
@@ -106,7 +108,7 @@ class TIIE_file_edit_from_py ():
                 if cell.value == name_column:
 
                     #asignamos los valores al diccionario
-                    self.colum["list"] = list(row) # fila donde se encuentra dicha valor
+                    self.colum["list"] = list(row) # fila donde se encuentra dicho valor
                     self.colum["value"] = cell # valor que se busca en el parametro
 
         return self.colum
@@ -199,10 +201,10 @@ class TIIE_file_edit_from_py ():
         cell = letter + cord_x + str(cord_y)
         return cell
 
-        # inserta un valor float en la siguiente celda de la column TIIE
 
+    # inserta un valor float en la siguiente celda de la column TIIE
     def insert_value_in_client(self,value: float,):
-
+        #TODO: realizar VALIDACIONES con respecto a la fecha para asi poder hacer una insercion de los datos a la fecha adecuada
         cell = self.get_next_cell_empty("TIIE")
         self.sheet_names[cell] = value
         self.Excel_document.save(self.path_file)
