@@ -7,7 +7,7 @@ En este script lo que queremos es obtener una serie de valores
 - concepto
 - subtotal
 - impuestos
-    - IVA
+    - IVA : root_CFDI[2][0][0][0][0].attrib["TasaOCuota"]
     - Ret IVA 
     - Ret ISR 
 - Total
@@ -26,9 +26,22 @@ class reed_xml :
         pass
 
 
-if __name__ == "__main__":
-    print(root_CFDI.tag)
+print(root_CFDI.tag)
     # for child in root_CFDI:
     #     print(child.tag, child.attrib)
-    for child in root: 
-        print(child)
+# for child in root: 
+#     print(child.attrib)
+
+print(root[0][1].text)
+
+# me permite obtener los datos de emisor del CFDI 
+print(root_CFDI[0].attrib)
+
+# me permite obtener los datos del receptor del CFDI 
+print(root_CFDI[1].attrib)
+
+# me permite obtener los datos de compra del producto
+print(root_CFDI[2][0].attrib)
+
+# me permite obtener los datos de los impuestos trasladados 
+print(root_CFDI[2][0][0][0][0].attrib["TasaOCuota"])

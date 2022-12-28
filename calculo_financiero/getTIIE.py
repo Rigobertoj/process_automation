@@ -149,7 +149,6 @@ def TIIE_por_fecha (fecha: str | datetime):
 
     #si fecha es del tipo str se convierte a datetime
     if type(fecha) == str:
-        print("validacion")
         dia, mes, año = fecha.split("/")
         print(año)
         fecha = datetime.strptime(f"{año}-{mes}-{dia}", '%Y-%m-%d')
@@ -168,6 +167,12 @@ def TIIE_por_fecha (fecha: str | datetime):
     #retornamos el ultimo valor que cumple con la condicion
     return value[-1]
 
+def Tasa_De_Interes_Anual ():
+    data = TIIE_Actual()
+    TIIE = data["dato"]
+    suma_de_interes_profile = 10
+    tasa_interes = TIIE + suma_de_interes_profile
+    return tasa_interes / 100
 
 
 if __name__ == "__main__":

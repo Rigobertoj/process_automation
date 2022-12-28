@@ -1,3 +1,4 @@
+from distutils.log import error
 from pydoc import cli
 from typing import List
 from xml.dom.minidom import Element
@@ -43,7 +44,6 @@ class TIIE_file_edit_from_py ():
         retorn list : lista de las hojas existentes en el documento en excel
 
         """
-        print(self.Excel_document.sheetnames)
         return self.Excel_document.sheetnames
 
 
@@ -85,13 +85,13 @@ class TIIE_file_edit_from_py ():
 
     #retorna un diccionario con un valor y una lista
     #el valor es la celda que almacena la columna de la TIIE
-    def get_row(self, name_column: str ):
+    def get_row(self, name_column: str ) -> dict | None:
         """
         params:
             name_column (str) : nombre de la culumna la cual bamos a buscar
 
         description:
-            nos permite buscar una columna a partir de su nombre en una fila o algun dato string que este en ella
+            nos permite buscar una columna a partir de su nombre en una fila o algun dato string que este en ella si no existe el valor o la columna retorna None
 
         return dict : dict[value, list] list -> lista con la fila donde se encuentra el valor por el cuall buscamos la fila, value -> celda donde esta diccho valor
         """
@@ -110,8 +110,9 @@ class TIIE_file_edit_from_py ():
                     #asignamos los valores al diccionario
                     self.colum["list"] = list(row) # fila donde se encuentra dicho valor
                     self.colum["value"] = cell # valor que se busca en el parametro
+                    return self.colum
+        
 
-        return self.colum
 
 
     #retorna un diccionario con un indice
@@ -122,23 +123,25 @@ class TIIE_file_edit_from_py ():
             name_column (str): titulo de la columna
 
         description:
-            este metodo lo que nos mermite es obtener el indice donde se encuentra la columna es decir si la saber si la columna es la primera, segunda, tercera etc.
+            este metodo lo que nos mermite es obtener el indice donde se encuentra la columna es decir saber si la columna es la primera, segunda, tercera etc.
         """
-        self.data_colum = {
-            "index": int,
-        }
+        self.data_colum = int
         # obtenemos la fila donde se encuentra el valor que se busca
         row = self.get_row(name_column=name_column)
 
+        if row == None:
+            return None
+
         #del diccionario obtenemos los valores de la lista
-        value_list = list(row["list"])
-        print(value_list)
+        value_list = row["list"]
+
+        #si no se encuntra la columna se retorna un error
 
 
         #iteramos por cada indice en la lista de celdas
         for i in range(len(value_list)):
             if(row["value"] == value_list[i]):
-                self.data_colum["index"] = i
+                self.data_colum = i
 
         print(self.data_colum)
         return self.data_colum
@@ -147,7 +150,7 @@ class TIIE_file_edit_from_py ():
     # LA PRIMERA LIST es una lista de celdas las cuales tiene un valor asignado de TIIE
     # LA SEGUNDA LIST es una lista con las celdas las cuales no tiene un valor asignado
 
-    def get_cells(self, name_column: str):
+    def get_cells(self, name_column: str) -> dict:
         """
         params: 
             name_column (str): nombre de la columna que queremos extraer sus valores
@@ -156,20 +159,16 @@ class TIIE_file_edit_from_py ():
             metodo que nos permite obtener una lista con las celdas que tienen los valores de la columna la cual buscamos
         """
         index_colum_TIIE = self.get_index_column(name_column)
-        values = []
-        Cells_empty = []
-        for cell in list(self.sheet_names.columns)[index_colum_TIIE["index"]]:
-            if cell.value != None:
-                values.append(cell)
-            else:
-                Cells_empty.append(cell)
 
-        lists = {
-        "Cells_whit_value":values,
-        "Cells_empty":Cells_empty
-        }
+        if index_colum_TIIE == None:
+            return None
+        
+        #obtenemos la lista de valores del la hoja de excel
+        list_column = list(self.sheet_names.columns)[index_colum_TIIE]
+        #filtramos la lista por aquellos valores que su valor sea distinto a None
+        lists_cells = list(filter(lambda x : x.value != None, list_column))
 
-        return lists
+        return lists_cells
 
 
         #retorna la siguiente celda en la clumna la cual este vacia
@@ -182,7 +181,10 @@ class TIIE_file_edit_from_py ():
                 este metodo lp qie nos propociona es obtener la siguinete celda vacia en una columna 
         """
         #obtenemos las la lista de celldas de la columna
-        lists_cell_value = self.get_cells(name_column)["Cells_whit_value"]
+        lists_cell_value = self.get_cells(name_column)
+
+        if lists_cell_value == None:
+            return None
         #obtenemos la ultima cellda que tiene un valor
         last_cell_with_value = lists_cell_value[-1]
 
@@ -191,14 +193,20 @@ class TIIE_file_edit_from_py ():
         print(f" empty cell {cell}")
 
         #desempaquetamos la el string cell
-        [letter ,cord_x, cord_y] = cell
+        print(f"celda {cell}")
+        [letter ,*cord_x] = cell
 
+        if len(cord_x) > 1:
+            print(cord_x)
+            cord_y = int(cord_x[1]) + 1
+            cord_x[1] = cord_y
+            cell = letter + cord_x[0] + str(cord_x[1])
         #despues a el valor que tiene la columna le sumamos uno
         #esto para que tenga el valor de siguiente celda vacia
-        cord_y = int(cord_y)+1
+        cord_y = int(cord_x[0])+1
 
         #volvemos ajuntar todo para retornarlo
-        cell = letter + cord_x + str(cord_y)
+        cell = letter + str(cord_x[0]) 
         return cell
 
 
@@ -214,15 +222,16 @@ class TIIE_file_edit_from_py ():
 
 if __name__ == "__main__":
     client = TIIE_file_edit_from_py(PATH)
-    client.set_sheet_name("Alejandro Ochoa")
+    client.set_sheet_name("Ing Antonio Maravilla")
 
     # # client.conver_string(1)
-    # cord = client.insert_value_in_client(.9,"D:/desarrolloDeSofware/backend/python/TIIE/read_xlsx/Control de crédito mensual .xlsx")
+    # cord = client.insert_value_in_client(.9)
     # value = conver_value(12)
     # tipe = value.conver_string()
     # print(type(tipe))
-
+    # 
     
-    colum = client.get_next_cell_empty("TIIE")
+    # print(client.get_sheet_names())
+    #     
+    colum = client.get_row("TIIE")
     print(colum)
-
