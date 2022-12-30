@@ -14,23 +14,33 @@ En este script lo que queremos es obtener una serie de valores
 """
 
 # asi se importa la libreria de xml
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 
 CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
 CFDI_TASA_SIMPLE = "./CFDI/A219EF14-71D3-11ED-8D49-9D4DF4D3414C.xml"
 
-#obtenemos el objeto xml
+with open(CFDI_TASA_SIMPLE)  as xml:
+    print (xml.name)
 
+CFDI = ET.parse(CFDI_TASA_0)
+
+#obtenemos el objeto xml
 tree = ET.parse(CFDI_TASA_0)
 
 #obtenemos el root del XML 
 root = tree.getroot()
 
+print(root[4].attrib)
+
+print("TIPPEEEEE")
+print (type(root))
+
 # imprimimos el 
-print(f"rooot : {root.tag}")
+data = root.attrib["Fecha"]
+print(f"rooot : {data}")
 
 
-print(root.tag)
+print(root[0])
     # for child in root_CFDI:
     #     print(child.tag, child.attrib)
 # for child in root: 
@@ -46,10 +56,13 @@ print(root[1].attrib)
 # me permite obtener los datos de compra del producto
 print(root[2][0].attrib)
 
-# me permite obtener los datos de los impuestos trasladados 
+# me permite obtener los datos de los impuestos trasladados
+print("GET") 
 print(root[2][0][0][0][0].attrib["TasaOCuota"])
 
 conceptos = root[2]
+
+print(f"tipe conceptos {type(conceptos)}")
 print(conceptos.attrib)
 
 print("products")
@@ -59,3 +72,4 @@ for concepto in conceptos:
     f{concepto[0][0][0].attrib}
     _____________________________________________________________
     """)
+
