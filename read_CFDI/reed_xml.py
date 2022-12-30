@@ -44,6 +44,11 @@ class reed_xml :
                 }
             },
             Clave_producto : str
+            mounts : [
+                {
+                    
+                }
+            ]
         }
             
     
@@ -148,7 +153,9 @@ class reed_xml :
             print(concepto)
         
         return Conceptos
-    
+    def get_taxes(): 
+        pass
+
     def get_mount(self, root : ET.Element):
         #obtenemos los productos o servicios
         products_servs = self.root[2]
