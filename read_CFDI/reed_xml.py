@@ -17,7 +17,9 @@ CFDI = {
 
 }
 
+
 """
+from    functools import reduce
 import xml.etree.cElementTree as ET
 import copy as c
 
@@ -46,7 +48,7 @@ class reed_xml :
             Clave_producto : str
             mounts : [
                 {
-                    
+
                 }
             ]
         }
@@ -63,6 +65,7 @@ class reed_xml :
 
         
         """
+        #obtenemos el folio fiscal
         folio_fiscal = self.get_tax_folio(self.xml)
 
         self.tree = ET.parse(self.xml)
@@ -76,14 +79,7 @@ class reed_xml :
         person = self.get_names(root= self.root)
         self.CFDI["Personas"] = person
 
-        clave_Produc_serv = self.get_clave_producto(root=self.root )
-
-        self.CFDI["clave_Produc_serv"] = clave_Produc_serv
-
-        self.get_concept(root=self.root)
-        # self.get_mount(root=self.root)
-
-        
+        self.get_mount(self.root)
 
 
         return self.CFDI
@@ -91,15 +87,20 @@ class reed_xml :
 
     def get_tax_folio (self, xml: str) -> str:
         """
-        description : function thats return a tax folio
+        description : funcion que nos permite obtener el folio fiscal del documento CFDI
 
         params :
+            - xml (str) : ruta donde se aloja el CFDI 
 
-        return (str)  : tax folio
+        return (str)  : folio fiscal
 
         """
-        with open(xml) as xml :
+
+        #abrimos el documento
+        with open(xml) as xml:
+            #obtenemos el nombre del archivo
             data = xml.name
+            
             #obtenemos el ultimo elemento de la lista pues ahi esta el folio
             folio = data.split("/")[-1]
 
@@ -108,9 +109,22 @@ class reed_xml :
             
 
 
-    def get_names(self, root : ET.Element) -> dict:
+    def get_names(self, root : ET.Element) -> dict[dict[str, str], dict[str, str]]:
+        """
+        Descriptcion : Metodo que nos permite obtener los nombres de las personas involucradas en la prestacion de un bien o servicio en un objeto dict separadas dentro del mismo por dos dict el primero siendo el Emisor y el segundo siendo el Receptor 
+
+        params : 
+            - root (ET.Element) : root es la raiz del CFDI
+
+        return dict[dict[str, str], dict[str, str]] : diccionario con el emisor y recepto en ese orden separador por dos diccionarios dentro del mismo 
+        """
+        #obtenemos los datos indexados 
+
+        #datos del emisor que estan en primera posicion
         Emisor_RFC = root[0].attrib["Rfc"]
-        Emisor_name = root[0].attrib["Nombre"],
+        Emisor_name = root[0].attrib["Nombre"]
+        
+        #datos del receptor que estan en la segunda posicion
         Receptor_RFC = root[1].attrib["Rfc"]
         Receptor_name = root[1].attrib["Nombre"]
 
@@ -126,49 +140,116 @@ class reed_xml :
         }
 
 
-    def get_date_bill (self, root : ET.Element):
+    def get_date_bill (self, root : ET.Element) -> list[dict[str, str]]:
         return root.attrib["Fecha"]
 
-
-    def get_clave_producto(self, root : ET.Element):
-        """
-        return : retorna la clave del producto o servicio
-        """
-        return root[2][0].attrib["ClaveProdServ"]
-        
-    
+            
     def get_concept(self, root : ET.Element):
-        products_servs = self.root[2]
-        products_servs_copy = c.copy(products_servs)
+        """
+        descripccion : metodo que nos permite obtener el objeto con los atributos de los conceptos descriptos en el CFDI asi obtenemos los datos como :
+            - clave del producto 
+            - Cantidad de unidades compradas de un producto
+            - Descripcion (el concepto de la factura)
+            - Valor unitarios
+            - Importe 
+            - Descuento
 
-        Conceptos = []
-        for producto_servi in products_servs_copy:
-            producto_servi.attrib.pop("NoIdentificacion")
-            producto_servi.attrib.pop("ClaveUnidad")
-            producto_servi.attrib.pop("Unidad")
+        params : 
+            - root (ET.Element) : root es la raiz del CFDI 
 
-            Conceptos.append(producto_servi.attrib)
+        return list[dict[str, int]] : retorna una lista con los objetos que contiene los atributos de los conceptos de cada producto
+
+        """
+
+        #obtenemos el elemento cfdi:Conceptos
+        Conceptos_product_serv = root[2]
+
+        #copeamos el objeto pues sera mutado
+        products_servs_copy = c.copy(Conceptos_product_serv)
         
-        for concepto in Conceptos:
-            print(concepto)
+        #funcion que nos permite eleminar y retornar los conceptos que necesitemos
+        def delete_attrib(element_conceptos : ET.Element):
+            element_conceptos.attrib.pop("NoIdentificacion")
+            element_conceptos.attrib.pop("ClaveUnidad")
+            element_conceptos.attrib.pop("Unidad")
+            return element_conceptos.attrib
+
+        # a traves de un mapeo eliminamos los atributos que no necesitamos
+        Conceptos = list(
+            map(
+                delete_attrib,
+                products_servs_copy
+                )
+            )
         
         return Conceptos
-    def get_taxes(): 
-        pass
+    
+    
+    def get_taxes(self, root : ET.Element):
+        """
+        Descripccion : Metodo que nos permite obtene el objeto con los atributos de los impuestos grabados a cada uno de los productos en la factura como :
+            - Base  (Base grabable)
+            - Impuesto (tipo)
+            - Tasa factor (Tasa)
+            - Tasa o cuota (porcentaje o monto)
+            - importe (cantidad a pagar)
 
-    def get_mount(self, root : ET.Element):
-        #obtenemos los productos o servicios
-        products_servs = self.root[2]
+        Params :
+            - root (ET.Element) :  root es la raiz del CFDI 
+
+
+        Return list[dict[str, str]] : una lista con los objetos que contiene los atributos de los impuestos grabados a cada producto
+        """
+        #obtenemos el elemento cfdi:Conceptos
+        Conceptos_product_serv = root[2]
+
+        #copeamos el elemento pues sera mutado
+        product_serv_copy = c.copy(Conceptos_product_serv)
+
+        #indexamos el elemento para obtener el objeto (dict) con los atributos de los impuestos calculados
+        get_mounts = lambda element : element[0][0][0].attrib
         
-        sub_totales = []
-        impuestos = {
-            "IVA": [],
-            "Ret. IVA" : [],
-            "Ret. ISR" : [],
-            "IEPS" : []
-        }
-        for producto_servi in products_servs:
-            print(producto_servi.attrib[0][0][0])
+        #aplicamos la funcion anterios a la lista con los productos o servicios
+        taxes = list(
+            map(
+                get_mounts, 
+                product_serv_copy
+            )
+        )
+        for taxe in taxes :
+            print(taxe.values())
+        return taxes
+        
+
+    
+    def get_mount(self, root : ET.Element):
+        """
+        
+        """
+        #obtenemos los productos o servicios
+        concepts = self.get_concept(root)
+
+        #obtenemos los impuestos de dichos productos o servicios
+        taxes = self.get_taxes(root)
+
+        #contruimos un unico objeto con las los valores de ambos
+        def contruc_item_produc_serv(concept : dict, taxe : dict):
+            #actualizamos los elementos de concepts
+            concept.update(taxe)
+            #retornamos el nuevo objeto
+            return concept
+
+
+        products_serv_mounts = list(
+            #mapeamos a la lista de objetos (productos e impuestos) con la funcion anterios
+            map(
+                contruc_item_produc_serv,
+                concepts,
+                taxes
+                )
+            )
+
+        return products_serv_mounts
 
 
 

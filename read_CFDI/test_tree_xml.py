@@ -29,8 +29,7 @@ tree = ET.parse(CFDI_TASA_0)
 
 #obtenemos el root del XML 
 root = tree.getroot()
-
-print(root[4].attrib)
+# print(root.attrib)
 
 print("TIPPEEEEE")
 print (type(root))
@@ -40,7 +39,7 @@ data = root.attrib["Fecha"]
 print(f"rooot : {data}")
 
 
-print(root[0])
+print("2 ", root[2].attrib)
     # for child in root_CFDI:
     #     print(child.tag, child.attrib)
 # for child in root: 
