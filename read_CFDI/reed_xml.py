@@ -1,38 +1,21 @@
-"""
-En este script lo que queremos es obtener una serie de valores 
-- fecha de factura : 
-- Num clave del producto 
-- folio fiscal (este esta en el titulo de documento)
-- nombre del emisor : root[0].attrib["Nombre"]
-- concepto
-- subtotal
-- impuestos
-    - IVA : root_CFDI[2][0][0][0][0].attrib["TasaOCuota"]
-    - Ret IVA 
-    - Ret ISR 
-- Total
-
-
-CFDI = {
-
-}
-
-
-"""
-from    functools import reduce
+from functools import reduce
 import xml.etree.cElementTree as ET
 import copy as c
+import os
+
 
 CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
-
+RFC = "PPR0610168Z1"
 class reed_xml :
     """
-    Descripcion : 
+    Descripcion : esta clase permite obtener a traves de un XML CFDI los datos de la misma factura asi como el dia de emision, los productos, la descripcion de los mismos, esto con el objetivo de brindas al desarrollador una mayor facilidad a la hora de extrar y analizar la informacion de un CFDI para su procesamiento
 
     Params :
 
     return : 
         CFDI = {
+            Tipo : str,
+            Efecto_fiscal : str,
             Fecha : str | Date, 
             Folio_fiscal : str,
             Personas : {
@@ -46,9 +29,19 @@ class reed_xml :
                 }
             },
             Clave_producto : str
-            mounts : [
+            Mounts : [
                 {
-
+                    'ClaveProdServ': str, 
+                    'Cantidad' : str,
+                    'Descripcion' : str,
+                    'ValorUnitario' : str,
+                    'Importe' : str,
+                    'Descuento' : str,
+                    'ObjetoImp' : str,
+                    'Base' : str, 
+                    'Impuesto' : str, 
+                    'TipoFactor' : str, 
+                    'TasaOCuota' : str
                 }
             ]
         }
@@ -56,8 +49,9 @@ class reed_xml :
     
     """
     CFDI = {}
-    def __init__(self, path_document : str, nombre = " ") -> None:
+    def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
         self.xml = path_document
+        self.RFC = RFC.upper()
 
 
     def get_data (self) -> dict:
@@ -65,11 +59,15 @@ class reed_xml :
 
         
         """
+        self.tree = ET.parse(self.xml)
+        self.root = self.tree.getroot()
+        
+        Tipo = self.get_tipo_CFDI(root=self.root)
+        self.CFDI["Tipo"] = Tipo
         #obtenemos el folio fiscal
         folio_fiscal = self.get_tax_folio(self.xml)
 
-        self.tree = ET.parse(self.xml)
-        self.root = self.tree.getroot()
+
             
         fecha = self.get_date_bill(root=self.root)
         self.CFDI["Fecha"] = fecha
@@ -79,10 +77,27 @@ class reed_xml :
         person = self.get_names(root= self.root)
         self.CFDI["Personas"] = person
 
-        self.get_mount(self.root)
+        mount = self.get_mount(self.root)
 
-
+        self.CFDI["Mount"] = mount
         return self.CFDI
+
+
+    def get_tipo_CFDI(self, root : ET.Element):
+        """
+        Descripcion : metodo que nos permite definir si un CFDI fue emitido o recibido esto para efecto fiscales.
+
+        params :
+            - root (ET.Element) : root es la raiz del CFDI
+            
+        return (str) : retorna Recibido o Emitido
+        """
+        Emisor = root[0].attrib
+
+        if Emisor["Rfc"] != self.RFC:
+            return "Recibido"
+        else :
+            return "Emitido"
 
 
     def get_tax_folio (self, xml: str) -> str:
@@ -95,7 +110,6 @@ class reed_xml :
         return (str)  : folio fiscal
 
         """
-
         #abrimos el documento
         with open(xml) as xml:
             #obtenemos el nombre del archivo
@@ -140,11 +154,20 @@ class reed_xml :
         }
 
 
-    def get_date_bill (self, root : ET.Element) -> list[dict[str, str]]:
+    def get_date_bill (self, root : ET.Element) -> str:
+        """
+        Descripcion : Metodo que nos permite retornar la fecha de emicion del CFDI
+
+        params :
+            - root (ET.Element) : root es la raiz del CFDI
+
+        return (str) : Retorna la fecha de emicion de la factura 
+
+        """
         return root.attrib["Fecha"]
 
             
-    def get_concept(self, root : ET.Element):
+    def get_concept(self, root : ET.Element) -> list[dict[str, str]]:
         """
         descripccion : metodo que nos permite obtener el objeto con los atributos de los conceptos descriptos en el CFDI asi obtenemos los datos como :
             - clave del producto 
@@ -168,11 +191,11 @@ class reed_xml :
         products_servs_copy = c.copy(Conceptos_product_serv)
         
         #funcion que nos permite eleminar y retornar los conceptos que necesitemos
-        def delete_attrib(element_conceptos : ET.Element):
-            element_conceptos.attrib.pop("NoIdentificacion")
-            element_conceptos.attrib.pop("ClaveUnidad")
-            element_conceptos.attrib.pop("Unidad")
-            return element_conceptos.attrib
+        def delete_attrib(Obj_concept : ET.Element):
+            if "NoIdentificacion" in Obj_concept : Obj_concept.attrib.pop("NoIdentificacion")
+            if "ClaveUnidad" in Obj_concept : Obj_concept.attrib.pop("ClaveUnidad")
+
+            return Obj_concept.attrib
 
         # a traves de un mapeo eliminamos los atributos que no necesitamos
         Conceptos = list(
@@ -181,7 +204,6 @@ class reed_xml :
                 products_servs_copy
                 )
             )
-        
         return Conceptos
     
     
@@ -216,28 +238,95 @@ class reed_xml :
                 product_serv_copy
             )
         )
-        for taxe in taxes :
-            print(taxe.values())
-        return taxes
-        
 
-    
+        return taxes
+
+    def get_tag(self, element_xml : ET.Element):
+        """
+        Descripcion : Metodo que nos prmite obtener el nombre de alguna etiqueta del CFDI: ejemplo :
+            - {http://www.sat.gob.mx/cfd/3}Retenciones -> Retenciones
+
+        Params : 
+            element_xml (ET.Element) : Este es el elemento del cual quiere obtener su etiqueta o tag
+
+        return (str) : Retorna el nombre de la etiqueda o tag del elemento introducido
+        """
+        tag = element_xml.tag.split("}")[1]
+        return tag
+
+
+    def get_Ret_taxes(self, root : ET.Element):
+        """
+        Descripccion : MEtodo que nos permite obtener las retenciones de un CFDI si este fuera algun pago por servicio profecional o alguna actividad a la cual se le hagan retenciones
+
+        params :
+            - root (ET.Element) :  root es la raiz del CFDI 
+
+        return dict[dict, dict] : Un diccionario con 2 dentro de si los cuales tiene las retenciones o cuotas retenidad.
+
+        """
+        conceptos = root[2]
+        ret = {}
+        i = 0
+        for concepto in conceptos:
+            if i > 0:
+                print("break")
+                break            
+            i += 1
+            for elements in concepto.iter():
+                tag = self.get_tag(elements)
+                if tag == "Retencion":
+                    ret[elements.attrib["Impuesto"]] = elements.attrib
+        
+        return ret 
+                
+
+    # def get_Ret_taxes_2(self, root: ET.Element) :
+    #     conceptos = root[2]
+    #     print(conceptos[0].attrib)
+    #     retenciones = filter(lambda element: self.get_tag(element) == "Retencion", conceptos)
+    #     print(list(retenciones))
+    #     ret = dict(
+    #         map(
+    #             lambda element: (element.attrib["Impuesto"], element.attrib),
+    #             retenciones   
+    #         )
+    #     )
+    #     return ret
+
     def get_mount(self, root : ET.Element):
         """
         
         """
         #obtenemos los productos o servicios
+        
         concepts = self.get_concept(root)
 
         #obtenemos los impuestos de dichos productos o servicios
         taxes = self.get_taxes(root)
-
+        
+        Retenciones = self.get_Ret_taxes(root)
         #contruimos un unico objeto con las los valores de ambos
         def contruc_item_produc_serv(concept : dict, taxe : dict):
-            #actualizamos los elementos de concepts
-            concept.update(taxe)
-            #retornamos el nuevo objeto
-            return concept
+            montos = {}
+            
+            tipo = self.get_tipo_CFDI(root)
+            montos["Concepto"] = concept
+            
+            if tipo == "Recibido" :
+                montos["Impuestos"] = { 
+                    "Acreditables" : taxe 
+                    }
+                if not (not Retenciones):
+                    montos["Impuestos"].update({"Trasladados" :Retenciones})
+            else:
+                montos["Impuestos"] = { 
+                    "Trasladados" : Retenciones 
+                    }
+                if not (not taxe): 
+                    montos["Impuestos"].update({"Acreditables" : Retenciones})
+
+            return montos
 
 
         products_serv_mounts = list(
@@ -252,8 +341,50 @@ class reed_xml :
         return products_serv_mounts
 
 
+def filter_file_dir_xml(path : str):
+    documents = os.listdir(path)
+    # print(documents[0].split(".")[1])
+
+    def obtener_extencion_archivo(file : str):
+        """
+        descriptcion : funcion que me permite evaluar si un archivo es un XML 
+
+        params : 
+            file (str) : es el nombre del archivo
+
+        return la extencion
+        """
+        document = file.split(".")
+        if len(document) == 2 and document[1] == 'xml':
+            return document[1]
+
+    list_xml = list(
+        map(lambda file : f"{path}/{file}",
+            filter(lambda file : obtener_extencion_archivo(file), documents)
+        )
+    )
+    return list_xml
+
+def reed_multiples_xml (path_dir, RFC: str) :
+    list_path_xml = filter_file_dir_xml(path_dir)
+    # re estructuracion funcioonal
+
+    def extract_data(path : str):
+        xml = reed_xml(path, RFC)
+        return xml.get_data()
+    
+    data = list(map(lambda path: extract_data(path), list_path_xml))
+    
+    return data
 
 
 if __name__ == "__main__":
-    DATA = reed_xml(CFDI_TASA_0)
-    print(DATA.get_data())
+#CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
+    CFDI_HONORARIOS = "./CFDI/4ABA0B0C-37D2-4127-9A43-B02C2432F392.xml" 
+
+    # DATA = reed_xml(CFDI_HONORARIOS, RFC=RFC)
+    # print(DATA.get_data())
+    dir_path = './CFDI/testing_CFDI'
+    xml = reed_multiples_xml(dir_path, RFC=RFC)
+
+    print(xml)

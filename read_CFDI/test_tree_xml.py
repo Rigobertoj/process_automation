@@ -18,6 +18,8 @@ import xml.etree.ElementTree as ET
 
 CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
 CFDI_TASA_SIMPLE = "./CFDI/A219EF14-71D3-11ED-8D49-9D4DF4D3414C.xml"
+CFDI_HONORARIOS = "./CFDI/4ABA0B0C-37D2-4127-9A43-B02C2432F392.xml" 
+
 
 with open(CFDI_TASA_SIMPLE)  as xml:
     print (xml.name)
@@ -29,46 +31,49 @@ tree = ET.parse(CFDI_TASA_0)
 
 #obtenemos el root del XML 
 root = tree.getroot()
+
+print(root.tag.split("}"))
+
 # print(root.attrib)
-
-print("TIPPEEEEE")
-print (type(root))
-
-# imprimimos el 
-data = root.attrib["Fecha"]
-print(f"rooot : {data}")
-
-
-print("2 ", root[2].attrib)
-    # for child in root_CFDI:
-    #     print(child.tag, child.attrib)
-# for child in root: 
-#     print(child.attrib)
+for element in root[2].iter():
+    print(element.tag)
+    print (element.attrib)
+    print("___________________________")
+# # imprimimos el 
+# data = root.attrib["Fecha"]
+# print(f"rooot : {data}")
 
 
-# me permite obtener los datos de emisor del CFDI 
-print("0 ", root[0].attrib)
+# print("2 ", root[2].attrib)
+#     # for child in root_CFDI:
+#     #     print(child.tag, child.attrib)
+# # for child in root: 
+# #     print(child.attrib)
 
-# me permite obtener los datos del receptor del CFDI 
-print(root[1].attrib)
 
-# me permite obtener los datos de compra del producto
-print(root[2][0].attrib)
+# # me permite obtener los datos de emisor del CFDI 
+# print("0 ", root[0].attrib)
 
-# me permite obtener los datos de los impuestos trasladados
-print("GET") 
-print(root[2][0][0][0][0].attrib["TasaOCuota"])
+# # me permite obtener los datos del receptor del CFDI 
+# print(root[1].attrib)
 
-conceptos = root[2]
+# # me permite obtener los datos de compra del producto
+# print(root[2][0].attrib)
 
-print(f"tipe conceptos {type(conceptos)}")
-print(conceptos.attrib)
+# # me permite obtener los datos de los impuestos trasladados
+# print("GET") 
+# print(root[2][0][0][0][0].attrib["TasaOCuota"])
 
-print("products")
-for concepto in conceptos:
-    print(f"""
-    f{concepto.attrib}
-    f{concepto[0][0][0].attrib}
-    _____________________________________________________________
-    """)
+# conceptos = root[2]
+
+# print(f"tipe conceptos {type(conceptos)}")
+# print(conceptos.attrib)
+
+# print("products")
+# # for concepto in conceptos:
+# #     print(f"""
+# #     f{concepto.attrib}
+# #     f{concepto[0][0][0].attrib}
+# #     _____________________________________________________________
+# #     """)
 
