@@ -1,0 +1,11 @@
+*env/
+
+*.xlsx
+
+*.txt
+
+*Ingresos/
+
+*Egresos/
+
+*.xlsx
