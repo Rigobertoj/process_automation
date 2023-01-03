@@ -73,7 +73,15 @@ class write_xlsx():
 
     def write_row_by_range(self,name_sheet :str, initial_cell : int, data = list, ):
         """
-        descripcion : metodo que nos
+        descripcion : metodo que nos permite modficar una fila a tarves de una lista con datos que queremos que sean asignados
+        a las celdad de forma ordenda 
+
+        al pasar la lista se toma la longitud de esta para saber cuantos datos a partir de la ceda dada como parametro "initial_cell" se necesitan modificar e iterar por la misma asignando a cada celda un dato de la lista
+
+        params :
+            - name_sheet (str) : establece la hoja o crear una nueva donde se ballan a escribir datos 
+            - initial_cell (str) : celda de la cual quieres partir la insercion de datos (ejemplo : "A1","B3" etc. )
+            - data (list) : datos los cuales quieres insertar en la fila
         """
         def letra_a_numero(letra):
             if len(letra) == 1:
