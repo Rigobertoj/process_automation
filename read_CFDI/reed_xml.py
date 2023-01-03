@@ -32,8 +32,16 @@ class reed_xml :
                     "Receptor_name" : str
                 }
             },
-            Clave_producto : str
-            Mounts : [
+            Mount = {
+                'SubTotal' : str,
+                'IVA' : str,
+                'IEPS' : str,
+                'Ret. IVA': str,
+                'Ret. ISR' : str,
+                'Total' : str
+            }
+
+            Mount_prod_serv : [
                 {
                    Concepto : {
                     'ClaveProdServ' : str,
@@ -43,29 +51,31 @@ class reed_xml :
                     'ValorUnitario' : str, 
                     'Importe' :str
                    },
-                   'Acreditables' : {
-                    'Base' : str, 
-                    'Impuesto' : str, 
-                    'TipoFactor' : str, 
-                    'TasaOCuota' : str, 
-                    'Importe' : str,
-                   }, 
-                   'Trasladados' : {
-                        002 (IVA) : {
-                            'Base' : str, 
-                            'Impuesto' : str, 
-                            'TipoFactor' : str, 
-                            'TasaOCuota' : str,
-                            'Importe' : str
+                   Impuestos = {
+                        'Acreditables' : {
+                         'Base' : str, 
+                         'Impuesto' : str, 
+                         'TipoFactor' : str, 
+                         'TasaOCuota' : str, 
+                         'Importe' : str,
+                        }, 
+                        'Trasladados' : {
+                             002 (IVA) : {
+                                 'Base' : str, 
+                                 'Impuesto' : str, 
+                                 'TipoFactor' : str, 
+                                 'TasaOCuota' : str,
+                                 'Importe' : str
+                             },
+                             001 (ISR) : {
+                                 'Base' : str, 
+                                 'Impuesto' : str, 
+                                 'TipoFactor' : str, 
+                                 'TasaOCuota' : str,
+                                 'Importe' : str
+                             }
                         },
-                        001 (ISR) : {
-                            'Base' : str, 
-                            'Impuesto' : str, 
-                            'TipoFactor' : str, 
-                            'TasaOCuota' : str,
-                            'Importe' : str
-                        }
-                   },
+                    }
                 }
             ]
         }
@@ -103,9 +113,11 @@ class reed_xml :
         person = self.get_names(root= self.root)
         self.__CFDI["Personas"] = person
 
-        mount = self.get_mount(self.root)
+        self.__CFDI["Mount"] = self.get_mount(self.root)
 
-        self.__CFDI["Mount"] = mount
+        Mount_prod_serv = self.get_mount_prod_serv(self.root)
+
+        self.__CFDI["Mount_prod_serv"] = Mount_prod_serv
         t2 = time.perf_counter()
 
         print(f"velodicad de ejecucion {t2-t1}")
@@ -237,8 +249,13 @@ class reed_xml :
             )
         return Conceptos
     
+
+    # def get_total_taxes(self, root: ET.Element):
+    #     Impuestos = root[3].attrib
+    #     return Impuestos
+
     
-    def get_taxes(self, root : ET.Element):
+    def get_taxes_prod_serv(self, root : ET.Element):
         """
         Descripccion : Metodo que nos permite obtene el objeto con los atributos de los impuestos grabados a cada uno de los productos en la factura como :
             - Base  (Base grabable)
@@ -255,7 +272,6 @@ class reed_xml :
         """
         #obtenemos el elemento cfdi:Conceptos
         Conceptos_product_serv = root[2]
-
         #copeamos el elemento pues sera mutado
         product_serv_copy = c.copy(Conceptos_product_serv)
 
@@ -286,7 +302,7 @@ class reed_xml :
         return tag
 
 
-    def get_Ret_taxes(self, root : ET.Element):
+    def get_Ret_taxes_prod_serv(self, root : ET.Element):
         """
         Descripccion : MEtodo que nos permite obtener las retenciones de un CFDI si este fuera algun pago por servicio profecional o alguna actividad a la cual se le hagan retenciones
 
@@ -311,7 +327,7 @@ class reed_xml :
         return ret 
             
 
-    def get_mount(self, root : ET.Element) -> list[dict[str, str]]:
+    def get_mount_prod_serv(self, root : ET.Element) -> list[dict[str, str]]:
         """
         Descripion : Metodo que nos permite obtener una lista de objeto los cueles tiene los montos de cada producto que se aquirio. 
 
@@ -328,9 +344,9 @@ class reed_xml :
         concepts = self.get_concept(root)
 
         #obtenemos los impuestos de dichos productos o servicios
-        taxes = self.get_taxes(root)
+        taxes = self.get_taxes_prod_serv(root)
         
-        Retenciones = self.get_Ret_taxes(root)
+        Retenciones = self.get_Ret_taxes_prod_serv(root)
 
         #contruimos un unico objeto con las los valores de ambos
         def contruc_item_produc_serv(concept : dict, taxe : dict):
@@ -367,12 +383,57 @@ class reed_xml :
         return products_serv_mounts
 
 
+    def get_mount(self, root: ET.Element):
+        mounts = {}
+        if 'SubTotal' in root.attrib : 
+            mounts['SubTotal'] = float(root.attrib["SubTotal"])
+        
+        if 'Descuento' in root.attrib :
+             mounts['Descuento'] = float(root.attrib['Descuento'])
+        else :
+            mounts['Descuento'] = 0
+
+        if 'Total' in root.attrib :
+            mounts['Total'] = float(root.attrib['Total'])
+        
+        taxes = self.get_taxes(root)
+        mounts.update(taxes)
+        return mounts
+
+
+    def get_taxes(self, root : ET.Element):
+        taxes = {}
+        Impuestos = root[3]
+        for impuesto in Impuestos.iter():
+            
+
+            if self.get_tag(impuesto) == "Traslado":
+                if '0.16' in impuesto.attrib["TasaOCuota"]:
+                    taxes['Traslado 16'] = impuesto.attrib
+                    
+                else:
+                    taxes['Traslado 0'] = impuesto.attrib
+                    
+            if self.get_tag(impuesto) == "Retencion":
+                Tipo_Impuesto = impuesto.attrib["Impuesto"]
+
+                taxes['Retenciones'] = {
+                    Tipo_Impuesto : impuesto.attrib
+                    }
+        
+        return taxes
+
+        
+            
+
+
 if __name__ == "__main__":
 #CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
     CFDI_HONORARIOS = "./CFDI/testing_CFDI/4ABA0B0C-37D2-4127-9A43-B02C2432F392.xml" 
 
-    DATA = reed_xml(CFDI_TASA_0, RFC=RFC)
-    print(DATA.get_data())
+    DATA = reed_xml(CFDI_HONORARIOS, RFC=RFC)
+    data = DATA.get_data()
+    print(data)
     # dir_path = './CFDI/testing_CFDI'
     # xml = reed_multiples_xml(dir_path, RFC=RFC)
 
