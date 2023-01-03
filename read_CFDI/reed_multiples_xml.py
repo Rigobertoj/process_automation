@@ -8,7 +8,7 @@ class multi_reed_xml():
         - dir_path (str) : ruta donde se encuentran los CFDI xml
         - RFC (str) : RFC de la empresa dueña de los CFDI
     """
-
+    __data = []
     def __init__(self, dir_path: str, RFC : str) -> None:
         self.dir_path = dir_path
         self.RFC = RFC
@@ -36,20 +36,38 @@ class multi_reed_xml():
         )
         return list_xml
 
-    def reed_multiples_xml (self) :
-
+    def get_data_from_multiples_xml (self) :
         list_path_xml = self.filter_file_dir_xml()
+
+        data = []
+        for file in list_path_xml:
+            xml = reed_xml(file, self.RFC)
+            data_xml = xml.get_data()
+            print(data_xml)
+            self.__data.append(data_xml)
+
         # re estructuracion funcioonal
 
-        def extract_data(path : str):
-            xml = reed_xml(path, self.RFC)
-            return xml.get_data()
+        # def extract_data(path : str):
+        #     print("file ", path)
+        #     xml = reed_xml(path, self.RFC)
+        #     print(xml.get_data())
+        #     return xml.get_data()
 
-        data = list(map(lambda path: extract_data(path), list_path_xml))
-
+        # data = list(map(lambda path: extract_data(path), list_path_xml))
+        # # print("__________________________________________")
+        # # print(data)
         return data
+
+    def get_data(self):
+        self.__data
+        print(self.__data)
+        return self.__data
 
 if __name__ == '__main__':
     dir_path = "./CFDI/Testing_CFDI"
     data = multi_reed_xml(dir_path, RFC)
-    print(len(data.reed_multiples_xml()))
+    # print(data.get_data_from_multiples_xml())
+    for item in data.get_data():
+        print("________________________________________________________")
+        print(item)
