@@ -85,6 +85,18 @@ class reed_xml :
         self.__RFC = RFC.upper()
 
 
+    def get_tag(self,root : ET.Element, name_tag: str):
+        
+        # Define una función de filtro que compruebe si el nombre de la etiqueta es 'Emisor'
+        def es_emisor(tag):
+            return self.get_name_tag(tag) == 'Emisor'
+    
+        # Obtiene el primer elemento que cumpla la condición utilizando next()
+        tag = next(filter(es_emisor, root.iter()))
+    
+        return tag
+
+
     def get_data (self) -> dict:
         """
         descripcion : metodo que nos permite obtener toda la informacion de un CFDI xml para su posterior procesado de esta manera podemos utilizar los dato del mismo de la manera que queramos
@@ -119,7 +131,7 @@ class reed_xml :
 
         # print(f"velodicad de ejecucion {t2-t1}")
         # print(sys.getsizeof(self.__CFDI))
-        
+        print(self.get_mount(self.root))
         return self.__CFDI
 
 
@@ -132,12 +144,14 @@ class reed_xml :
             
         return (str) : retorna Recibido o Emitido
         """
-        Emisor = root[0].attrib
 
-        if Emisor["Rfc"] != self.__RFC:
-            return "Recibido"
-        else :
-            return "Emitido"
+        Emisor = self.get_tag(root, 'Emisor')
+
+        if "Rfc" in Emisor:
+            if Emisor["Rfc"] != self.__RFC:
+                return "Recibido"
+            else :
+                return "Emitido"
 
 
     def get_tax_folio (self, xml: str) -> str:
@@ -268,14 +282,20 @@ class reed_xml :
 
         Return list[dict[str, str]] : una lista con los objetos que contiene los atributos de los impuestos grabados a cada producto
         """
+        # TODO : restructuracion del codigo
         #obtenemos el elemento cfdi:Conceptos
         Conceptos_product_serv = root[2]
         #copeamos el elemento pues sera mutado
         product_serv_copy = c.copy(Conceptos_product_serv)
 
         #indexamos el elemento para obtener el objeto (dict) con los atributos de los impuestos calculados
+        print(product_serv_copy.attrib)
+        for element in product_serv_copy.iter():
+            if "Concepto" == self.get_name_tag(element):
+                return element.attrib
+
         get_mounts = lambda element : element[0][0][0].attrib
-        
+        get_mounts_2 = filter(lambda tag : self.get_name_tag(tag) == 'Concepto')
         #aplicamos la funcion anterios a la lista con los productos o servicios
         taxes = list(
             map(
@@ -286,7 +306,7 @@ class reed_xml :
 
         return taxes
 
-    def get_tag(self, element_xml : ET.Element):
+    def get_name_tag(self, element_xml : ET.Element):
         """
         Descripcion : Metodo que nos prmite obtener el nombre de alguna etiqueta del CFDI: ejemplo :
             - {http://www.sat.gob.mx/cfd/3}Retenciones -> Retenciones
@@ -310,7 +330,7 @@ class reed_xml :
         return dict[dict, dict] : Un diccionario con 2 dentro de si los cuales tiene las retenciones o cuotas retenidad.
 
         """
-        conceptos = root[2]
+        conceptos = self.get_tag(root, 'Conceptos')
         ret = {}
         i = 0
         for concepto in conceptos:
@@ -318,7 +338,7 @@ class reed_xml :
                 break            
             i += 1
             for elements in concepto.iter():
-                tag = self.get_tag(elements)
+                tag = self.get_name_tag(elements)
                 if tag == "Retencion":
                     ret[elements.attrib["Impuesto"]] = elements.attrib
         
@@ -405,24 +425,24 @@ class reed_xml :
     def get_taxes(self, root : ET.Element):
         # TODO : Create the doc
         taxes = {}
-        Impuestos = root[3]
+        Impuestos = self.get_tag(root, 'Impuestos')
         for impuesto in Impuestos.iter():
             
 
-            if self.get_tag(impuesto) == "Traslado":
+            if self.get_name_tag(impuesto) == "Traslado":
                 if '0.16' in impuesto.attrib["TasaOCuota"]:
                     taxes['Traslado 16'] = impuesto.attrib
                     
                 else:
                     taxes['Traslado 0'] = impuesto.attrib
                     
-            if self.get_tag(impuesto) == "Retencion":
+            if self.get_name_tag(impuesto) == "Retencion":
                 Tipo_Impuesto = impuesto.attrib["Impuesto"]
 
                 taxes['Retenciones'] = {
                     Tipo_Impuesto : impuesto.attrib
                     }
-        
+
         return taxes
 
         
@@ -431,9 +451,10 @@ class reed_xml :
 
 if __name__ == "__main__":
 #CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
+    produce_un_error = './CFDI/testing_CFDI/052227d9-4d89-4438-b6c1-0dd183dfc4a1.xml'
     CFDI_HONORARIOS = "./CFDI/testing_CFDI/4ABA0B0C-37D2-4127-9A43-B02C2432F392.xml" 
 
-    DATA = reed_xml(CFDI_HONORARIOS, RFC=RFC)
+    DATA = reed_xml(produce_un_error, RFC=RFC)
     data = DATA.get_data()
     print(data)
     # dir_path = './CFDI/testing_CFDI'

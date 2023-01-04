@@ -42,6 +42,8 @@ class multi_reed_xml():
         data = []
         for file in list_path_xml:
             xml = reed_xml(file, self.RFC)
+            folio_fiscal = xml.get_tax_folio(file)
+            print(f"Folio fiscal {folio_fiscal}")
             data_xml = xml.get_data()
             print(data_xml)
             self.__data.append(data_xml)
@@ -67,7 +69,7 @@ class multi_reed_xml():
 if __name__ == '__main__':
     dir_path = "./CFDI/Testing_CFDI"
     data = multi_reed_xml(dir_path, RFC)
-    # print(data.get_data_from_multiples_xml())
-    for item in data.get_data():
-        print("________________________________________________________")
-        print(item)
+    print(data.get_data_from_multiples_xml())
+    # for item in data.get_data():
+    #     print("________________________________________________________")
+    #     print(item)
