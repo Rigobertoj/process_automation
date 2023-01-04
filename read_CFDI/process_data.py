@@ -49,9 +49,12 @@ class Process_data():
         *_, data = data
         data_dict = {}
         data_dict["Tipo"] = data["Tipo"]
+        data_dict["Fecha en el estado de cuenta"] = " "
         data_dict["Fecha factura"] = self.crear_fecha(data["Fecha"])
-        data_dict["Tipo"] = " "
+        data_dict["Operacion"] = " "
         data_dict["Clase"] = " "
+        # TODO: realizar una evalucion sobre cual es el producto con el valor mas significantly
+        # y asignar ese como Num Clase
         data_dict["Num Clase"] = " " 
         data_dict["Folio fiscal"] = data["Folio_fiscal"]
         
@@ -84,6 +87,15 @@ class Process_data():
 
         concepto = " ".join(lista_valores_conceptos)   
         data_dict["Concepto"] = concepto
+        
+        data_dict["Sub total"] = data["Mount"]["SubTotal"]
+        data_dict["Descuento"] = data["Mount"]["Descuento"]
+        # data_dict["IEPS"] = data["Mount"]["IEPS"]
+        # data_dict["IVA"]
+        # data_dict["Ret. IVA."]
+        # data_dict["Ret. ISR."]
+        
+        data_dict["Total"] = data["Mount"]["Total"]
         # print("Conceptos " + concepto_1)
         # print(data_dict)
         return data_dict
@@ -101,10 +113,14 @@ class Process_data():
             data = xml.get_data()
             data_process_xml= self.process_xml_data(data)
             print(data_process_xml)
+            # for key, value in data_process_xml.items():
+            #     print(value)
+            #     if key == "Total": break 
             # print(data["Mount_prod_serv"][0]["Impuestos"]["Acreditables"])
             
 
 if __name__ == '__main__':
     dir_path = "./CFDI/Testing_CFDI"
     conjunto_data_CFDI = Process_data(dir_path,RFC)
-    conjunto_data_CFDI.get_data()
+    data = conjunto_data_CFDI.get_data()
+    print(data)
