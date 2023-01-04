@@ -117,8 +117,8 @@ class reed_xml :
         self.__CFDI["Mount_prod_serv"] = Mount_prod_serv
         t2 = time.perf_counter()
 
-        print(f"velodicad de ejecucion {t2-t1}")
-        print(sys.getsizeof(self.__CFDI))
+        # print(f"velodicad de ejecucion {t2-t1}")
+        # print(sys.getsizeof(self.__CFDI))
         
         return self.__CFDI
 
@@ -398,6 +398,7 @@ class reed_xml :
         
         taxes = self.get_taxes(root)
         mounts.update(taxes)
+        # print(mounts)
         return mounts
 
 
