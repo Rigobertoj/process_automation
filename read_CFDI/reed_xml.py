@@ -34,10 +34,7 @@ class reed_xml :
             },
             Mount = {
                 'SubTotal' : str,
-                'IVA' : str,
-                'IEPS' : str,
-                'Ret. IVA': str,
-                'Ret. ISR' : str,
+                'Descuento' : str
                 'Total' : str
             }
 
@@ -256,6 +253,7 @@ class reed_xml :
 
     
     def get_taxes_prod_serv(self, root : ET.Element):
+        # TODO : changue the doc 
         """
         Descripccion : Metodo que nos permite obtene el objeto con los atributos de los impuestos grabados a cada uno de los productos en la factura como :
             - Base  (Base grabable)
@@ -384,6 +382,8 @@ class reed_xml :
 
 
     def get_mount(self, root: ET.Element):
+        # TODO : Create the doc
+
         mounts = {}
         if 'SubTotal' in root.attrib : 
             mounts['SubTotal'] = float(root.attrib["SubTotal"])
@@ -402,6 +402,7 @@ class reed_xml :
 
 
     def get_taxes(self, root : ET.Element):
+        # TODO : Create the doc
         taxes = {}
         Impuestos = root[3]
         for impuesto in Impuestos.iter():
