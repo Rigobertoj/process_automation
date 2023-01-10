@@ -1,8 +1,11 @@
 from process_data import Process_data, reed_xml, multi_reed_xml
 from write_xlsx import write_xlsx
 
+
 def get_xml_data(directorio,RFC):
+    # obtenemos los datos de los xml para su procesamineto
     response_data_xml = Process_data(dir_path=directorio, RFC=RFC)
+    # procesamos y obtenemos los datos que nos importan
     data = response_data_xml.get_data()
     return data
 
@@ -28,7 +31,7 @@ def insert_data(xls_directorio : str,name_sheet : str, initial_cell : str ,matri
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
-    xml_directorio = './read_CFDI/CFDI/enero/'
+    xml_directorio = './CFDI/Testing_CFDI/'
     xls_directorio = './xls/Enero_2022.xlsx'
     nome_sheet = "Clasificacion de gastos"
     name_sheet = "Conjunto de gastos"
