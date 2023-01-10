@@ -1,0 +1,104 @@
+<!-- esta etiqueta es la raiz del archivo estandar y especifica el alfaveto utilizado  -->
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<Carga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/Carga.xsd">
+    <!-- contiene los datos sobre el usuario (la empresa) -->
+    <Encabezado>
+        <ClaveOtorgante>0000701008</ClaveOtorgante>
+        <NombreOtorgante>MuebleriaHernandez</NombreOtorgante>
+        <IdentificadorDeMedio>AZ</IdentificadorDeMedio>
+        <FechaExtraccion>20030603</FechaExtraccion>
+        <NotaOtorgante>Las cintas se entregaran por medio de paqueteria</NotaOtorgante>
+        <Version>5</Version>
+    </Encabezado>
+    <Personas>
+        <Persona>
+            <Nombre>
+                <ApellidoPaterno>CERVANTES</ApellidoPaterno> <!-- OBLIGATORIO  -->
+                <ApellidoMaterno>LUNA</ApellidoMaterno> <!-- OBLIGATORIO  -->
+                <ApellidoAdicional>FLORES</ApellidoAdicional> <!-- OBLIGATORIO  -->
+                <Nombres>ARACELI</Nombres> <!-- OBLIGATORIO  -->
+                <FechaNacimiento>19750508</FechaNacimiento> <!-- OBLIGATORIO  -->
+                <RFC>CELA750508122</RFC> <!-- OBLIGATORIO  -->
+                <CURP>CELA750508MDFRNRO9</CURP>
+                <NumeroSeguridadSocial>20064184494</NumeroSeguridadSocial>
+                <Nacionalidad>MX</Nacionalidad>
+                <Residencia>1</Residencia>
+                <NumeroLicenciaConducir>C03935690</NumeroLicenciaConducir>
+                <EstadoCivil>C</EstadoCivil>
+                <Sexo>F</Sexo>
+                <ClaveElectorIFE>CRLUAR75050809M700</ClaveElectorIFE>
+                <NumeroDependientes>2</NumeroDependientes>
+                <FechaDefuncion></FechaDefuncion>
+                <IndicadorDefuncion></IndicadorDefuncion>
+                <TipoPersona>PF</TipoPersona>
+            </Nombre>
+            <Domicilios>
+                <Domicilio>
+                    <Direccion>RIO AYOTLAMZ 46 LT 9</Direccion>
+                    <ColoniaPoblacion>PETROLERA AMPLIACION</ColoniaPoblacion>
+                    <DelegacionMunicipio>AZCAPOTZALCO</DelegacionMunicipio>
+                    <Ciudad>MEXICO</Ciudad>
+                    <Estado>CDMX</Estado>
+                    <CP>02470</CP>
+                    <FechaResidencia>19991230</FechaResidencia>
+                    <NumeroTelefono>53833570</NumeroTelefono>
+                    <TipoDomicilio>C</TipoDomicilio>
+                    <TipoAsentamiento>7</TipoAsentamiento>
+                    <OrigenDomicilio>MX</OrigenDomicilio>
+                </Domicilio> 
+                <Domicilio>
+                    <Direccion>JARDINES 13</Direccion>
+                    <ColoniaPoblacion>UNIDAD PEMEX</ColoniaPoblacion>
+                    <DelegacionMunicipio>AZCAPOTZALCO</DelegacionMunicipio>
+                    <Ciudad>MEXICO</Ciudad>
+                    <Estado>CDMX</Estado>
+                    <CP>02419</CP>
+                    <FechaResidencia>19920723</FechaResidencia>
+                    <NumeroTelefono>53822345</NumeroTelefono>
+                    <TipoDomicilio>C</TipoDomicilio>
+                    <TipoAsentamiento>14</TipoAsentamiento>
+                    <OrigenDomicilio>MX</OrigenDomicilio>
+                </Domicilio>
+            </Domicilios> 
+            <Empleos>
+                <Empleo>
+                    <NombreEmpresa>PANADERIA LA IDEAL</NombreEmpresa>
+                    <Direccion>AMATISTA 45</Direccion>
+                    <ColoniaPoblacion>HACIENDA DEL ROSARIO</ColoniaPoblacion>
+                    <DelegacionMunicipio>AZCAPOTZALCO</DelegacionMunicipio>
+                    <Ciudad>MEXICO</Ciudad>
+                    <Estado>CDMX</Estado>
+                    <CP>02420</CP>
+                    <NumeroTelefono>53941124</NumeroTelefono>
+                    <Extension>1013</Extension>
+                    <Fax>53941124</Fax>
+                    <Puesto>CAJERA</Puesto>
+                    <FechaContratacion>20020727</FechaContratacion>
+                    <ClaveMoneda>MX</ClaveMoneda>
+                    <SalarioMensual>7000</SalarioMensual>
+                    <FechaUltimoDiaEmpleo></FechaUltimoDiaEmpleo>
+                    <FechaVerificacionEmpleo>20030225</FechaVerificacionEmpleo>
+                    <OrigenRazonSocialDomicilio>MX</OrigenRazonSocialDomicilio>
+                </Empleo>
+                <Empleo>
+                    <NombreEmpresa>ZAPATERIA SAN MARTIN</NombreEmpresa>
+                    <Direccion>LERDO DE TEJADA 73</Direccion>
+                    <ColoniaPoblacion>AZCAPOTZALCO 2000</ColoniaPoblacion>
+                    <DelegacionMunicipio>AZCAPOTZALCO</DelegacionMunicipio>
+                    <Ciudad>MEXICO</Ciudad>
+                    <Estado>CDMX</Estado>
+                    <CP>02420</CP>
+                    <NumeroTelefono>53822290</NumeroTelefono>
+                    <Extension>1345</Extension>
+                    <Fax>53822290</Fax>
+                    <Puesto>VENDEDORA</Puesto>
+                    <FechaContratacion>19981212</FechaContratacion>
+                    <ClaveMoneda>MX</ClaveMoneda>
+                    <SalarioMensual>5000</SalarioMensual>
+                    <FechaUltimoDiaEmpleo>20020616</FechaUltimoDiaEmpleo>
+                    <FechaVerificacionEmpleo>20001122</FechaVerificacionEmpleo>
+                    <OrigenRazonSocialDomicilio>MX</OrigenRazonSocialDomicilio>
+                </Empleo>
+            </Empleos>   
+          
+</Carga>
