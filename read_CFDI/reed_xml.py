@@ -83,6 +83,8 @@ class reed_xml :
     def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
         self.xml = path_document
         self.__RFC = RFC.upper()
+        #TODO : Crear un atributo que atravez de un metodo(o funcion) me permita validad el tipo de CFDI que se ingresa y asi procesarlo de la manera mas adecuada
+        self.type = ""
 
 
     def get_tag(self,root : ET.Element, name_tag: str):
