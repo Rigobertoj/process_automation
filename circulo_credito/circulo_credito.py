@@ -48,10 +48,7 @@ class Persona():
 {tags_elemsnt}
         </{name_tag}>
         """
-    
-    
 
-    
     
     def __data_validate__(self, list_validaciones : list[str], nota = " "):
         print(type(list_validaciones))
@@ -82,7 +79,10 @@ class Persona():
         self.Tag_Cuenta = self.Cuenta()
         return f"""
     <Persona>
-    
+        {self.Tag_Nombre}
+        {self.Tag_Domicilio}
+        {self.Tag_Empleos}
+        {self.Tag_Cuenta}
     </Persona>
             """
     
@@ -92,7 +92,7 @@ class Persona():
         list_validacion = ['RFC', 'PRIMER NOMBRE', 'SEGUNDO NOMBRE', 'APELLIDO PATERNO', 'APELLIDO MATERNO', 'FECHA DE NACIMIENTO']
         Name_tag = "Nombre"
          
-        element_data = self.__data_validate__(list_validacion, "<Nombre>")
+        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
         tag_nombre = self.Create_element(element_data, Name_tag)   
         
         print(tag_nombre)
@@ -104,7 +104,7 @@ class Persona():
         list_validacion = ['CALLE', 'NUMERO EXTERIOR', 'NUMERO INTERIOR', 'COLONIA', 'DELEGACION O MUNICIPIO', 'CIUDAD', 'ESTADO', 'CODIGO POSTAL']
         
         Name_tag = "Domicilio"
-        element_data = self.__data_validate__(list_validacion, "<Domicilio>")
+        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
         tag_domicilio = self.Create_element(element_data, Name_tag)
         return tag_domicilio
         
@@ -124,9 +124,10 @@ class Persona():
     def Empleo(self):
         list_validacion = ['NOMBRE O RAZON SOCIAL', 'DIRECCION', 'COLONIA POBLACIONAL', 'DELEGACION MUNICIPAL', 'CIUDAD E', 'ESTADO E', 'CP E']
         Name_tag = "Empleo"
-        element_data = self.__data_validate__(list_validacion, "<Empleo>")
+        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
         tag_empleo = self.Create_element(element_data, Name_tag)
         return tag_empleo
+        
         
     def Empleos(self):
         tag_empleo = self.Empleo()
@@ -136,8 +137,13 @@ class Persona():
     </Empleos>
     """
     
+    
     def Cuenta(self):
-        pass 
+        list_validacion = ['NOMBRE DEL USUARIO QUE REPORTA EL CREDITO', 'NUMERO CREDITO VIGENTE', 'TIPO DE RESPONSABILIDAD', 'TIPO DE CREDITO ', 'TIPO DE PRODUCTO', 'MONEDA', 'FRECUENCIA DE PAGO', 'MONTO DE PAGO', 'FECHA DE APERTURA', 'FECHA DE ULTIMO PAGO', 'MONTO DEL CREDITO A LA ORIGINACION', 'PLAZO EN MESES', 'FECHA DE LA ULTIMA DISPOSICION O COMPRA', 'FECHA DEL REPORTE ACTUALIZACION O CORTE', 'CREDITO MAXIMO UTILIZADO', 'SALDO ACTUAL', 'SALDO VENCIDO ', 'FORMA DE PAGO O PAGO ACTUAL', 'FECHA DEL PRIMER INCUMPLIMIENTO', 'SALDO INSOLUTO DEL PRINCIPAL', 'MONTO DEL ULTIMO PAGO']
+        Name_tag = "Cuenta"
+        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
+        tag_cuenta = self.Create_element(element_data, Name_tag)
+        return tag_cuenta
         
     
 class circulo_credito(Persona):
@@ -182,6 +188,12 @@ class circulo_credito(Persona):
         return self.Create_element(elemnt_data, name_tag)
     
     
+    def __data_acreditantes__(self):
+        data = ""
+        for acreditante in self.lista_data_acreditantes:
+            super().__init__(acreditante)
+    
+    
     def get_doc(self):
         
         """
@@ -194,7 +206,11 @@ class circulo_credito(Persona):
 
         """
         file_data = f"{self.ClaveOtorgante}_{self.NombreOtorgante}_{self.FechaCorte}.xml"
-            
+        
+        
+        
+        Persona_1 = self.Persona()
+        
         with open(file_data, 'w') as f:
             
             f.write(f"""
@@ -256,8 +272,10 @@ if __name__ == "__main__":
         Data_encabezado["ClaveOtorgante"],
         Data_encabezado["NotaOtorgante"], 
         Data_encabezado["FechaExtraccion"],
-        []
+        [acreditante_1]
         )
     
     acreditante = Persona(acreditante_1)
-    print(acreditante.Empleos())
+    # print(acreditante.Persona())
+    
+    
