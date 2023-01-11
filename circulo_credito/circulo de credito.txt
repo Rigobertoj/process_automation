@@ -1,0 +1,76 @@
+El archivo debe de contener una nomenclatura especifica para que este pueda ser reconocido de la manera adecuada :
+datos a obtener
+- Clave de usuario 
+- Nombre de usuario
+- Fecha de corte ( AAAAMMDD )
+- extencion xml
+
+La información dentro del archivo se divide en 4 secciones
+I. cliente
+ - RFC
+ - Primer nombre
+ - Segundo y otros nombres 
+ - Apellido Paterno
+ - Segundo Apellido
+ - Fecha de Nacimiento
+II. Domicilio
+ - Calle
+ - Número Exterior
+ - Número Interior
+ - Colonia
+ - Delegación o Municipio
+ - Ciudad
+ - Estado
+ - Código Postal
+
+
+III.Empleo o Actividad Económica: 
+ - Nombre o Razón Social del Empleador
+
+
+IV. Crédito :
+ - Clave del Usuario que reporta el crédito
+ - Nombre del Usuario que reporta el crédito
+ - Número Crédito Vigente
+ - Tipo de Responsabilidad 
+ - Tipo de Crédito 
+ - Tipo de Producto
+ - Moneda
+ - Frecuencia de Pago
+ - Monto de Pago
+ - Fecha de Apertura 
+ - Fecha del Último Pago
+ - Fecha de Apertura 
+ - Fecha del Último Pago
+ - Monto del Crédito a la Originación
+ - Plazo en Meses
+ - Fecha de la Última Disposición o Compra
+ - Fecha del reporte, Actualización o Corte
+ - Crédito Máximo Utilizado
+ - Saldo Actual
+ - Saldo Vencido
+ - Forma de Pago o Pago Actual
+ - Fecha del Primer Incumplimiento
+ - Saldo Insoluto del Principal
+ - Monto del Último Pago
+
+# estructura de catga XML 
+
+ < >CERVANTES</>
+ <ApellidoMaterno>LUNA</ApellidoMaterno>
+ <ApellidoAdicional>FLORES</ApellidoAdicional>
+ <Nombres>ARACELI</Nombres>
+ <FechaNacimiento>19750508</FechaNacimiento>
+ <RFC>CELA750508122</RFC>
+ <CURP>CELA750508MDFRNRO9</CURP>
+ <NumeroSeguridadSocial>20064184494</NumeroSeguridadSocial>
+ <Nacionalidad>MX</Nacionalidad>
+ <Residencia>1</Residencia>
+ <NumeroLicenciaConducir>C03935690</NumeroLicenciaConducir>
+ <EstadoCivil>C</EstadoCivil>
+ <Sexo>F</Sexo>
+ <ClaveElectorIFE>CRLUAR75050809M700</ClaveElectorIFE>
+ <NumeroDependientes>2</NumeroDependientes>
+ <FechaDefuncion></FechaDefuncion>
+ <IndicadorDefuncion></IndicadorDefuncion>
+ <TipoPersona>PF</TipoPersona> 
