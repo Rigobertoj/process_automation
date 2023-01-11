@@ -33,7 +33,7 @@ class Persona():
             
         params : 
             - name_tag : nombre de la etique que retorna el metodo
-            - elemnt_data (dict) : diccionario con los datos de los elementos hijo de la etique 
+            - elemnt_data (dict) : diccionario con los datos de los elementos hijo de la etique
         """
     
         Indentacion = "             "
@@ -51,14 +51,12 @@ class Persona():
 
     
     def __data_validate__(self, list_validaciones : list[str], nota = " "):
-        print(type(list_validaciones))
         data_acreditante = self.data_acreditante
         
         if nota == "<Empleo>": 
             print(data_acreditante)
 
         
-        print(data_acreditante)
         element_data = {}
         for value in list_validaciones:
             if value in data_acreditante:
@@ -95,7 +93,6 @@ class Persona():
         element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
         tag_nombre = self.Create_element(element_data, Name_tag)   
         
-        print(tag_nombre)
         return tag_nombre
         
         
@@ -165,6 +162,8 @@ class circulo_credito(Persona):
 
     
     """
+    __version = 5
+    
     def __init__(self, ClaveOtorgante : int, NombreOtorgante : int, FechaCorte : int, lista_data_acreditantes : list[dict]) -> None:
         """
             params : 
@@ -172,10 +171,13 @@ class circulo_credito(Persona):
                 - NombreOtorgante (str) :
                 - FechaCorte (str) :
         """
-        
-        self.ClaveOtorgante =  ClaveOtorgante
-        self.NombreOtorgante = NombreOtorgante
-        self.FechaCorte = FechaCorte
+        self.data_encabezado = {
+            "ClaveOtorgante" : ClaveOtorgante,
+            "NombreOtorgante" : NombreOtorgante,
+            "FechaCorte" : FechaCorte,
+            "Version" : self.__version
+        }
+
         self.lista_data_acreditantes = lista_data_acreditantes
         self.tag_root_xml = """<?xml version="1.0" encoding="ISO-8859-1"?> """
         
@@ -188,14 +190,26 @@ class circulo_credito(Persona):
         return self.Create_element(elemnt_data, name_tag)
     
     
-    def __data_acreditantes__(self):
-        data = ""
+    def __data_tag_personas(self):
+        """
+        descripcion : Metodo que nos permite obtener la etiqueta Personas con la data de cada uno de los acreditantes que esten dentro de la propiedad lista_data_acreditantes
+        """
+        data = []
         for acreditante in self.lista_data_acreditantes:
             super().__init__(acreditante)
+            tag_persona = self.Persona()
+            data.append(tag_persona)
+        
+        tag_personas = reduce(lambda tag, dat, : tag + dat, data)
+        print(tag_personas)
+        return f"""
+    <Personas>
+        {tag_personas}
+    </Personas>
+    """
     
     
     def get_doc(self):
-        
         """
          descripcion : fucion que nos proporciona el archivo root con lod datos de cada uno de los acreditantes
          
@@ -205,24 +219,26 @@ class circulo_credito(Persona):
         return (file) : archivo xml 
 
         """
-        file_data = f"{self.ClaveOtorgante}_{self.NombreOtorgante}_{self.FechaCorte}.xml"
+        ClaveOtorgante = self.data_encabezado["ClaveOtorgante"]
+        NombreOtorgante = self.data_encabezado["NombreOtorgante"]
+        FechaCorte = self.data_encabezado["FechaCorte"]
         
-        
-        
-        Persona_1 = self.Persona()
+        file_data = f"{ClaveOtorgante}_{NombreOtorgante}_{FechaCorte}.xml"
+        tag_personas = self.__data_tag_personas()
+        tag_encabezado = self.Encabezado()
         
         with open(file_data, 'w') as f:
             
             f.write(f"""
 {self.tag_root_xml}
 <Carga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/Carga.xsd">
-{self.encabezado}
-
+{tag_encabezado}
+{tag_personas}
 </Carga>  """)
             
     
         
-    def Encabezado(self, element_data : dict):
+    def Encabezado(self):
         """
             descripcion : Metodo que nos permite retorna la eiqueta Encabezado junto a sus variables minimas.
             - ! : identificador de datos obligatorios 
@@ -238,13 +254,13 @@ class circulo_credito(Persona):
                     
             return : None
         """
-        list_validation = ['ClaveOtorgante', 'NombreOtorgante', 'FechaExtraccion', ]
         Name_tag = "Encabezado"
+        tag_encabezado = self.Create_element(self.data_encabezado, Name_tag)
+        return tag_encabezado
         
-        element_data["Version"] = 5
         
-        self.encabezado = self.element_validation(list_validation, element_data, Name_tag)
-        print(self.encabezado)
+        
+
 
         
 
@@ -274,7 +290,7 @@ if __name__ == "__main__":
         Data_encabezado["FechaExtraccion"],
         [acreditante_1]
         )
-    
+    XML.get_doc()
     acreditante = Persona(acreditante_1)
     # print(acreditante.Persona())
     
