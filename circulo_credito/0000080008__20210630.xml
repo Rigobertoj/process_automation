@@ -1,0 +1,18 @@
+
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<Carga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/Carga.xsd">
+
+        <Encabezado>
+        
+             <ClaveOtorgante>0000080008</ClaveOtorgante>
+             <NombreOtorgante>PROMOTORA PROFILE</NombreOtorgante>
+             <IdentificadorDeMedio>AZ</IdentificadorDeMedio>
+             <FechaExtraccion>20210630</FechaExtraccion>
+             <NotaOtorgante></NotaOtorgante>
+             <Version>5</Version>
+
+        </Encabezado>
+         
+</Carga> 
+                   
+                    
