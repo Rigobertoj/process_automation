@@ -98,5 +98,4 @@ if __name__ == "__main__":
     sheet_name = "Info_creditos"
     creditos = reed_xlsx(f"./{work_file_name}.xlsx", sheet_name)
     data_acrediatnte = creditos.get_data_row()[0]
-    for key,value in data_acrediatnte.items():
-        print(f"{key}  : {value}")
+    print(data_acrediatnte)

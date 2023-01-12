@@ -13,6 +13,7 @@ I. cliente
  - Apellido Paterno
  - Segundo Apellido
  - Fecha de Nacimiento
+
 II. Domicilio
  - Calle
  - Número Exterior
@@ -29,7 +30,7 @@ III.Empleo o Actividad Económica: 
 
 
 IV. Crédito :
- - Clave del Usuario que reporta el crédito
+ - Clave del Usuario que reporta el crédito 
  - Nombre del Usuario que reporta el crédito
  - Número Crédito Vigente
  - Tipo de Responsabilidad 
