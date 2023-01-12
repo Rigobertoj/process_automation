@@ -1,5 +1,6 @@
 from functools import reduce
-acreditante_1 = {'RFC': 'RARC860607497', 'PRIMER NOMBRE': 'CARLOS', 'SEGUNDO NOMBRE': 'MANUEL', 'APELLIDO PATERNO': 'RAMIREZ', 'APELLIDO MATERNO': 'ROSALES', 'FECHA DE NACIMIENTO': 20141127, 'CALLE': 'SANTA TERESA DE JESUS', 'NUMERO EXTERIOR': 266, 'NUMERO INTERIOR': None, 'COLONIA': 'CAMINO REAL', 'DELEGACION O MUNICIPIO': 'ZAPOPAN', 'CIUDAD': 'ZAPOPAN', 'ESTADO': 'JALISCO', 'CODIGO POSTAL': 45040, 'NOMBRE O RAZON SOCIAL': 'CARLOS MANUEL RAMIREZ ROSALES', 'DIRECCION': 'SANTA TERESA DE JESUS 266', 'COLONIA POBLACIONAL': 'CAMINO REAL', 'DELEGACION MUNICIPAL': 'ZAPOPAN', 'CIUDAD E': 'ZAPOPAN', 'ESTADO E': 'JALISCO', 'CP E': 45040, 'CLAVE DEL USUARIO QUE REPORTA EL CREDITO': None, 'NOMBRE DEL USUARIO QUE REPORTA EL CREDITO': None, 'NUMERO CREDITO VIGENTE': None, 'TIPO DE RESPONSABILIDAD': 'I', 'TIPO DE CREDITO ': 'P', 'TIPO DE PRODUCTO': 'AR', 'MONEDA': 'MX', 'FRECUENCIA DE PAGO': 'M', 'MONTO DE PAGO': 80000, 'FECHA DE APERTURA': 20211206, 'FECHA DE ULTIMO PAGO': 20220825, 'MONTO DEL CREDITO A LA ORIGINACION': 2000000, 'PLAZO EN MESES': 24, 'FECHA DE LA ULTIMA DISPOSICION O COMPRA': 20211206, 'FECHA DEL REPORTE ACTUALIZACION O CORTE': 20230113, 'CREDITO MAXIMO UTILIZADO': 2000000, 'SALDO ACTUAL': 2000000, 'SALDO VENCIDO ': 583878.5893709798, 'FORMA DE PAGO O PAGO ACTUAL': 7, 'FECHA DEL PRIMER INCUMPLIMIENTO': 20220306, 'SALDO INSOLUTO DEL PRINCIPAL': 2000000, 'MONTO DEL ULTIMO PAGO': 28501.87}
+acreditante_1 = {'RFC': 'RARC860607497', 'Nombres': 'CARLOS MANUEL', 'ApellidoPaterno': 'RAMIREZ', 'ApellidoMaterno': 'ROSALES', 'FechaNacimiento': 20141127, 'Direccion': 'SANTA TERESA DE JESUS 266', 'ColoniaPoblacional': 'CAMINO REAL', 'DelegacionMunicipio': 'ZAPOPAN', 'Ciudad': 'ZAPOPAN', 'Estado': 'JALISCO', 'CP': 45040, 'NombreEmpresa': 'CARLOS MANUEL RAMIREZ ROSALES', 'Direccion E': 'SANTA TERESA DE JESUS 266', 'ColoniaPoblacion E': 'CAMINO REAL', 'DelegacionMunicipal E': 'ZAPOPAN', 'Ciudad E': 'ZAPOPAN', 'Estado E': 
+'JALISCO', 'CP E': 45040, 'ClaveActualOtorgante': None, 'NombreOtorgante': None, 'CuentaActual': None, 'TipoResponsabilidad': 'I', 'TipoCuenta': 'P', 'TipoContrato': 'AR', 'ClaveUnidadMonetaria': 'MX', 'FrecuenciaPagos': 'M', 'MontoPagar': 80000, 'FechaAperturaCuenta': 20211206, 'FechaUltimoPago': 20220825, 'FechaUltimaCompra': 20211206, 'FechaCorte': 20230113, 'CreditoMaximo': 2000000, 'SaldoActual\xa0': 2000000, 'Limite credito': None, 'SaldoVencido': 583878.5893709798, 'PagoActual': 7, 'FechaPrimerIncumplimiento': 20220306, 'SaldoInsoluto': 2000000, 'MontoUltimoPago': 28501.87, 'PlazoMeses': 24, 'MontoCreditoOriginacion': 2000000}
         
 class Persona():
     """
@@ -20,7 +21,16 @@ class Persona():
     """
     def __init__(self,data_acreditante : dict):
         self.data_acreditante = data_acreditante
+        self.__set_list_tag__(data_acreditante)
+        
     
+    def __set_list_tag__(self, data_acreditante : dict):
+        list_keys_data_acreditante = list(data_acreditante.keys())
+        self.list_data_creditor_keys_name  = list_keys_data_acreditante[:5]
+        self.list_data_creditor_keys_Domicilio = list_keys_data_acreditante[5:11]
+        self.list_data_creditor_keys_job = list_keys_data_acreditante[11:18]
+        self.list_data_creditor_keys_acount = list_keys_data_acreditante[18:]
+        
         
     def Create_element(self, elemnt_data: dict, name_tag: str):
         """
@@ -86,23 +96,20 @@ class Persona():
     
     
     def Nombre(self): 
-        
-        list_validacion = ['RFC', 'PRIMER NOMBRE', 'SEGUNDO NOMBRE', 'APELLIDO PATERNO', 'APELLIDO MATERNO', 'FECHA DE NACIMIENTO']
         Name_tag = "Nombre"
          
-        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
+        element_data = self.__data_validate__(self.list_data_creditor_keys_name, f"<{Name_tag}>")
         tag_nombre = self.Create_element(element_data, Name_tag)   
         
         return tag_nombre
         
         
     def Domicilio(self):
-
-        list_validacion = ['CALLE', 'NUMERO EXTERIOR', 'NUMERO INTERIOR', 'COLONIA', 'DELEGACION O MUNICIPIO', 'CIUDAD', 'ESTADO', 'CODIGO POSTAL']
-        
         Name_tag = "Domicilio"
-        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
+        
+        element_data = self.__data_validate__(self.list_data_creditor_keys_Domicilio, f"<{Name_tag}>")
         tag_domicilio = self.Create_element(element_data, Name_tag)
+        
         return tag_domicilio
         
         
@@ -119,9 +126,9 @@ class Persona():
     
     
     def Empleo(self):
-        list_validacion = ['NOMBRE O RAZON SOCIAL', 'DIRECCION', 'COLONIA POBLACIONAL', 'DELEGACION MUNICIPAL', 'CIUDAD E', 'ESTADO E', 'CP E']
+        
         Name_tag = "Empleo"
-        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
+        element_data = self.__data_validate__(self.list_data_creditor_keys_job, f"<{Name_tag}>")
         tag_empleo = self.Create_element(element_data, Name_tag)
         return tag_empleo
         
@@ -136,9 +143,14 @@ class Persona():
     
     
     def Cuenta(self):
-        list_validacion = ['NOMBRE DEL USUARIO QUE REPORTA EL CREDITO', 'NUMERO CREDITO VIGENTE', 'TIPO DE RESPONSABILIDAD', 'TIPO DE CREDITO ', 'TIPO DE PRODUCTO', 'MONEDA', 'FRECUENCIA DE PAGO', 'MONTO DE PAGO', 'FECHA DE APERTURA', 'FECHA DE ULTIMO PAGO', 'MONTO DEL CREDITO A LA ORIGINACION', 'PLAZO EN MESES', 'FECHA DE LA ULTIMA DISPOSICION O COMPRA', 'FECHA DEL REPORTE ACTUALIZACION O CORTE', 'CREDITO MAXIMO UTILIZADO', 'SALDO ACTUAL', 'SALDO VENCIDO ', 'FORMA DE PAGO O PAGO ACTUAL', 'FECHA DEL PRIMER INCUMPLIMIENTO', 'SALDO INSOLUTO DEL PRINCIPAL', 'MONTO DEL ULTIMO PAGO']
         Name_tag = "Cuenta"
-        element_data = self.__data_validate__(list_validacion, f"<{Name_tag}>")
+        
+        element_data = self.__data_validate__(self.list_data_creditor_keys_acount, f"<{Name_tag}>")
         tag_cuenta = self.Create_element(element_data, Name_tag)
+        
         return tag_cuenta
         
+        
+if __name__ == "__main__":
+    acreditante = Persona(acreditante_1)
+    print(acreditante.Persona())
