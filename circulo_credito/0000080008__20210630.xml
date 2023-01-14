@@ -48,12 +48,12 @@
         <Empleo>
         
              <NombreEmpresa>CARLOS MANUEL RAMIREZ ROSALES</NombreEmpresa>
-             <Direccion E>SANTA TERESA DE JESUS 266</Direccion E>
-             <ColoniaPoblacion E>CAMINO REAL</ColoniaPoblacion E>
-             <DelegacionMunicipal E>ZAPOPAN</DelegacionMunicipal E>
-             <Ciudad E>ZAPOPAN</Ciudad E>
-             <Estado E>JALISCO</Estado E>
-             <CP E>45040</CP E>
+             <Direccion>SANTA TERESA DE JESUS 266</Direccion>
+             <ColoniaPoblacion>CAMINO REAL</ColoniaPoblacion>
+             <DelegacionMunicipal>ZAPOPAN</DelegacionMunicipal>
+             <Ciudad>ZAPOPAN</Ciudad>
+             <Estado>JALISCO</Estado>
+             <CP>45040</CP>
 
         </Empleo>
         
@@ -76,7 +76,7 @@
              <FechaUltimaCompra>20211206</FechaUltimaCompra>
              <FechaCorte>20230113</FechaCorte>
              <CreditoMaximo>2000000</CreditoMaximo>
-             <SaldoActual>2000000</SaldoActual>
+             <SaldoActual�>2000000</SaldoActual�>
              <Limite credito>None</Limite credito>
              <SaldoVencido>583878.5893709798</SaldoVencido>
              <PagoActual>7</PagoActual>
@@ -85,6 +85,82 @@
              <MontoUltimoPago>28501.87</MontoUltimoPago>
              <PlazoMeses>24</PlazoMeses>
              <MontoCreditoOriginacion>2000000</MontoCreditoOriginacion>
+
+        </Cuenta>
+        
+    </Persona>
+            
+    <Persona>
+        
+        <Nombre>
+        
+             <RFC>None</RFC>
+             <Nombres>None</Nombres>
+             <ApellidoPaterno>None</ApellidoPaterno>
+             <ApellidoMaterno>None</ApellidoMaterno>
+             <FechaNacimiento>None</FechaNacimiento>
+
+        </Nombre>
+        
+        
+    <Domicilios>
+        
+        <Domicilio>
+        
+             <Direccion>None</Direccion>
+             <ColoniaPoblacional>None</ColoniaPoblacional>
+             <DelegacionMunicipio>None</DelegacionMunicipio>
+             <Ciudad>None</Ciudad>
+             <Estado>None</Estado>
+             <CP>None</CP>
+
+        </Domicilio>
+        
+    </Domicilios>
+        
+        
+    <Empleos>
+        
+        <Empleo>
+        
+             <NombreEmpresa>None</NombreEmpresa>
+             <Direccion>None</Direccion>
+             <ColoniaPoblacion>None</ColoniaPoblacion>
+             <DelegacionMunicipal>None</DelegacionMunicipal>
+             <Ciudad>None</Ciudad>
+             <Estado>None</Estado>
+             <CP>None</CP>
+
+        </Empleo>
+        
+    </Empleos>
+    
+        
+        <Cuenta>
+        
+             <ClaveActualOtorgante>None</ClaveActualOtorgante>
+             <NombreOtorgante>None</NombreOtorgante>
+             <CuentaActual>None</CuentaActual>
+             <TipoResponsabilidad>None</TipoResponsabilidad>
+             <TipoCuenta>None</TipoCuenta>
+             <TipoContrato>None</TipoContrato>
+             <ClaveUnidadMonetaria>None</ClaveUnidadMonetaria>
+             <FrecuenciaPagos>None</FrecuenciaPagos>
+             <MontoPagar>None</MontoPagar>
+             <FechaAperturaCuenta>None</FechaAperturaCuenta>
+             <FechaUltimoPago>None</FechaUltimoPago>
+             <FechaUltimaCompra>None</FechaUltimaCompra>
+             <FechaCorte>None</FechaCorte>
+             <CreditoMaximo>None</CreditoMaximo>
+             <SaldoActual�>None</SaldoActual�>
+             <Limite credito>None</Limite credito>
+             <SaldoVencido>None</SaldoVencido>
+             <PagoActual>None</PagoActual>
+             <FechaPrimerIncumplimiento>None</FechaPrimerIncumplimiento>
+             <SaldoInsoluto>None</SaldoInsoluto>
+             <MontoUltimoPago>None</MontoUltimoPago>
+             <PlazoMeses>None</PlazoMeses>
+             <MontoCreditoOriginacion>None</MontoCreditoOriginacion>
 
         </Cuenta>
         

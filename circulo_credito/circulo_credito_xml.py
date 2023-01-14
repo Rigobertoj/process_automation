@@ -69,12 +69,12 @@ class circulo_credito(Persona):
     """
     
     
-    def get_doc(self):
+    def get_doc(self, save_path : str = ""):
         """
          descripcion : fucion que nos proporciona el archivo root con lod datos de cada uno de los acreditantes
          
          params :
-            - None
+            - save_path : ruta relativa donde necesite que sea guardado el archivo
             
         return (file) : archivo xml 
 
@@ -82,8 +82,11 @@ class circulo_credito(Persona):
         ClaveOtorgante = self.data_encabezado["ClaveOtorgante"]
         NombreOtorgante = self.data_encabezado["NombreOtorgante"]
         FechaCorte = self.data_encabezado["FechaCorte"]
-        
         file_data = f"{ClaveOtorgante}_{NombreOtorgante}_{FechaCorte}.xml"
+        
+        if save_path!= "":
+            file_data = f"{save_path}/{file_data}"
+                
         tag_personas = self.__data_tag_personas()
         tag_encabezado = self.Encabezado()
         
@@ -150,7 +153,7 @@ if __name__ == "__main__":
         Data_encabezado["FechaExtraccion"],
         [acreditante_1]
         )
-    XML.get_doc()
+    XML.get_doc("./xml_circulo_credito")
     acreditante = Persona(acreditante_1)
     # print(acreditante.Persona())
     

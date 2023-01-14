@@ -25,6 +25,11 @@ class Persona():
         
     
     def __set_list_tag__(self, data_acreditante : dict):
+        """descripcion : Metodo nos establece las distintas lista con las claves (de un diccionario) que se deben de validar en la creacion de cada una de la etiquetas de 
+
+        Params :
+            data_acreditante (dict): diccionaraio con todos los datos minimos requeridos de un acreditado provenientes del excel 
+        """
         list_keys_data_acreditante = list(data_acreditante.keys())
         self.list_data_creditor_keys_name  = list_keys_data_acreditante[:5]
         self.list_data_creditor_keys_Domicilio = list_keys_data_acreditante[5:11]
@@ -61,12 +66,15 @@ class Persona():
 
     
     def __data_validate__(self, list_validaciones : list[str], nota = " "):
+        """
+        Descripcion : Metodo que nos permite validar los datos de un acreditante en etiquetas XML
+        En si lo que hace es que  
+        
+        params : 
+            - list_validaciones (list[str]) : lista con los nombres de las validaciones
+        """
         data_acreditante = self.data_acreditante
-        
-        if nota == "<Empleo>": 
-            print(data_acreditante)
-
-        
+                
         element_data = {}
         for value in list_validaciones:
             if value in data_acreditante:
@@ -96,6 +104,14 @@ class Persona():
     
     
     def Nombre(self): 
+        """
+        Descripcion : Metodo que nos permite crear el elemento <Nombre> de un acreditado en formato XML para su integracion en el XML principal
+        
+        params : 
+            - None
+            
+        return (str) : etiqueta <Nombre> con todos los datos ya validados  
+        """
         Name_tag = "Nombre"
          
         element_data = self.__data_validate__(self.list_data_creditor_keys_name, f"<{Name_tag}>")
@@ -126,13 +142,40 @@ class Persona():
     
     
     def Empleo(self):
-        
         Name_tag = "Empleo"
+        
         element_data = self.__data_validate__(self.list_data_creditor_keys_job, f"<{Name_tag}>")
+        
+            
+        
+        # TODO : re estrucutracion 
+        # data_clen_part_1 = list(map(lambda key: key[:-2] , filter(lambda  key : "E" in key[-2:], list(element_data.keys()))))
+        
+        # data_clen_part_2 = list(filter(lambda key: "E" not in key[-2:], list(element_data.keys())))
+        # print(data_clen_part_1)
+        # print(data_clen_part_2)
+        # data_clean = data_clen_part_2.append(data_clen_part_1)
+        # print(data_clean)
+        # data_element = {key : value for key, value in zip(data_clean, list(element_data.values()))}
+        
+        # print(list(data_element))    
+        
+        # element_data_2 = {key_ : value for key_, value in element_data.items() if "E" in key_[-2:]}
+        # print(element_data_2)
+        
+        # TODO : re estructuracion funcional 
+        for key in list(element_data.keys()):
+            if "E" in key[-2:]:
+                current_value_key = element_data[key]
+                new_key = key[:-2]
+                del element_data[key]
+                element_data[new_key] = current_value_key
+                        
+        # print(element_data.keys()) 
         tag_empleo = self.Create_element(element_data, Name_tag)
         return tag_empleo
         
-        
+
     def Empleos(self):
         tag_empleo = self.Empleo()
         return f"""
