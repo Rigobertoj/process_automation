@@ -2,6 +2,8 @@ import openpyxl
 from openpyxl import load_workbook
 from openpyxl import Workbook
 import os
+import copy
+
 
 class write_xlsx():
     """
@@ -95,9 +97,9 @@ class write_xlsx():
                 print("else")
                 return 26 * letra_a_numero(letra[:-1]) + letra_a_numero(letra[-1])
             
-        def asigacion_de_data(value, cell):
-            cell.value = value
-            return cell 
+        def asigacion_de_data(data,cell):
+            cell.value = data
+            return cell
            
         #obtenemos la columna desde que se empezada
         colunn = initial_cell[0]
@@ -121,39 +123,46 @@ class write_xlsx():
             fila_a_editar = self.ws.iter_rows(
             min_row=row, max_row=row, min_col=num_column, max_col=max_col
             )
-            fila_vasia = self.validate_content(fila_a_editar)
-            print(fila_vasia)
-            if not fila_vasia:
-                print("No Vasia")
-                return rows_iter(row + 1, num_column, max_col)
+            
+            
+            fila_validada = self.Empty_row(fila_a_editar)
+            
+            print(f"Fila_vasia {fila_validada}")
+            
+            if fila_validada:
+                print("if ")
+                return fila_validada
             else:
-                print("VASIA")
-                return fila_a_editar
+                print("else")
+                return rows_iter(row + 1, num_column, max_col)
             
         fila_a_editar = rows_iter(row, num_column, max_col)
+        fila_a_editar = fila_a_editar[0]
         print(fila_a_editar)
-        
         value = list(
             map(asigacion_de_data, 
             data,
-            tuple(
-                map(lambda cell : cell, fila_a_editar))
-            )
-        )
-        print(value)
+            fila_a_editar
+        ))
+        print(f"value {value}")
         self.wb.save(self.__path_file)
         
-    def validate_content (self, iter_rows):
-        print(iter_rows)
-        for row in iter_rows:
+    def Empty_row (self, fila_a_editar):
+        validate = {True}
+
+        copi_row = copy.copy(list(fila_a_editar))
+        print(copi_row)
+        for row in copi_row:
             for cell in row:
-                print(cell)
                 if cell.value != None:
-                    return False
-        return True    
-            
+                    validate.add(False)
+                    
+        if False  not in validate:
+            return copi_row
+        
+        return False            
             
 
 if __name__ == "__main__":
     enero = write_xlsx(path_file="./xls/Enero_2022.xlsx")
-    enero.write_row_by_range("Clasificacion de gastos", "A1", ["2"])
+    enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
