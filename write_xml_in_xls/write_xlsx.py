@@ -113,9 +113,12 @@ class write_xlsx():
         #obtenemos el maximo de celdad que se van a escribir
         max_col = num_column + len(data) -1
         
+        #si el valor del argumento nombre existe dentro del workbook 
         if name_sheet in self.wb.sheetnames:
+            #asignando el objeto worksheet a una propiedad 
             self.ws = self.wb[name_sheet]
         else:
+            #si no creamos una hoja con el nombre del argumento 
             self.ws = self.wb.create_sheet(name_sheet)
 
         # celda inicial y celda final del rango a escribir
@@ -124,21 +127,20 @@ class write_xlsx():
             min_row=row, max_row=row, min_col=num_column, max_col=max_col
             )
             
-            
+            # retornamos la validacion de la fila vacia
             fila_validada = self.Empty_row(fila_a_editar)
             
-            print(f"Fila_vasia {fila_validada}")
             
             if fila_validada:
-                print("if ")
                 return fila_validada
             else:
-                print("else")
                 return rows_iter(row + 1, num_column, max_col)
             
         fila_a_editar = rows_iter(row, num_column, max_col)
         fila_a_editar = fila_a_editar[0]
+        
         print(fila_a_editar)
+        
         value = list(
             map(asigacion_de_data, 
             data,
