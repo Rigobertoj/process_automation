@@ -178,19 +178,16 @@ class write_xlsx():
         print(f"value {value}")
         self.wb.save(self.__path_file)
         
-    def Empty_row (self, fila_a_editar):
-        validate = {True}
-
+    def Empty_row (self, fila_a_editar):        
         copi_row = copy.copy(list(fila_a_editar))
+        
         for row in copi_row:
             for cell in row:
                 if cell.value != None:
-                    validate.add(False)
-                    
-        if False  not in validate:
-            return copi_row
+                    return False            
+                                    
+        return copi_row
         
-        return False            
 
 if __name__ == "__main__":
     enero = write_xlsx("./xls/Enero_2022.xlsx")
