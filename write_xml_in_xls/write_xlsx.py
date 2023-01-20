@@ -135,10 +135,10 @@ class write_xlsx():
         row = int(initial_cell[-1]) 
 
         #obtenemos el numero de la culumna donde esta esa celda
-        num_column = letra_a_numero(colunn)
+        initial_column = letra_a_numero(colunn)
         
         #obtenemos el maximo de celdad que se van a escribir
-        max_col = num_column + len(data) -1
+        max_col = initial_column + len(data) -1
         
         #si el valor del argumento nombre existe dentro del workbook 
         if name_sheet in self.wb.sheetnames:
@@ -150,23 +150,21 @@ class write_xlsx():
             self.ws = self.wb.active
 
         # celda inicial y celda final del rango a escribir
-        def rows_iter(row, num_column, max_col):
+        def rows_iter(row, initial_column, max_col):
             fila_a_editar = self.ws.iter_rows(
-            min_row=row, max_row=row, min_col=num_column, max_col=max_col
-            )
+                min_row=row, 
+                max_row=row, 
+                min_col=initial_column, 
+                max_col=max_col
+                )
             
-            
-            print(type(fila_a_editar))
             # retornamos la validacion de la fila vacia
             fila_validada = self.Empty_row(fila_a_editar)
             
+            return fila_validada if fila_validada else rows_iter(row + 1, initial_column, max_col)
+
             
-            if fila_validada:
-                return fila_validada
-            else:
-                return rows_iter(row + 1, num_column, max_col)
-            
-        fila_a_editar = rows_iter(row, num_column, max_col)
+        fila_a_editar = rows_iter(row, initial_column, max_col)
         fila_a_editar = fila_a_editar[0]
         
         print(fila_a_editar)
