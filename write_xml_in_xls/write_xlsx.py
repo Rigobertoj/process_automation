@@ -1,6 +1,6 @@
-import openpyxl
 from openpyxl import load_workbook
 from openpyxl import Workbook
+from typeguard import typechecked
 import os
 import copy
 
@@ -20,8 +20,9 @@ class write_xlsx():
     
     sheets = {}
     item = 1
-
-    def __init__(self, name_woorkbook = "", path_file = "",  ) -> None:
+    
+    @typechecked
+    def __init__(self, file_name : str) -> None:
 
         """
         description: crea un nuevo documento con el cual se va a trabajar o establece el document que se manipulara.
@@ -34,23 +35,49 @@ class write_xlsx():
 
 
         """
-        try :
-            print("try")
-            if name_woorkbook  != "":
-                print("workbook")
-                self.wb = Workbook(name_woorkbook)
-                print(self.wb)
-                self.__path_file = name_woorkbook
-            elif path_file != "":
-                print("loading path")
-                print(self.item)
-                self.wb = load_workbook(path_file)
-                print("WB ")
-                self.__path_file = path_file
-        except: ValueError("Introduce una ruta o nombre de archivo valido")
+                    
+        if self._is_valid_path(file_name):
+            self._load_file(file_name) if os.path.exists(file_name) else self._create_file(file_name)
+            self.__path_file = file_name
+            return
+            
+        else:
+            raise ValueError("Introduce una ruta o nombre de archivo valido")
+                
+    
+    def _is_valid_path(self, path : str):
+        """Descripcion : metodo que nos permite validar si un string es una ruta de una archivo
+
+        Params:
+            path (str): String que se quiere validar si es una ruta de una archivo
+
+        Returns:
+            boolean: retorna True o False dependiendo de la validacion 
+        """
+        if os.path.isabs(path) :
+            return True
+        elif not os.path.isabs(path) :
+            return True
+        else:
+            return False
 
 
+    def _load_file(self, file_name  :str):
+        """Description : Carga el documento excel a travez de la ruta introducida
 
+        Args:
+            file_name (str): ruta del archivo que se quiere cargar
+        """
+        self.wb = load_workbook(file_name)
+            
+            
+    def _create_file(self, file_name :str):
+        """Descripción : Crea un documento excel a través de la ruta introducida 
+        
+        Args:
+            file_name (str) : Ruta y nombre donde se quiere crear el documento excel
+        """
+        self.wb =  Workbook(file_name)
 
     def get_shenames(self) -> list[str, str]:
         """
@@ -63,7 +90,7 @@ class write_xlsx():
         return self.wb.sheetnames
 
 
-
+    @typechecked
     def set_sheet_name(self, sheet_name: str,) -> str:
         """
         description: establece la hoja del documento que se procesara o manipulara
@@ -94,7 +121,6 @@ class write_xlsx():
             if len(letra) == 1:
                return ord(letra) - ord('A') + 1
             else:
-                print("else")
                 return 26 * letra_a_numero(letra[:-1]) + letra_a_numero(letra[-1])
             
         def asigacion_de_data(data,cell):
@@ -120,6 +146,7 @@ class write_xlsx():
         else:
             #si no creamos una hoja con el nombre del argumento 
             self.ws = self.wb.create_sheet(name_sheet)
+            self.ws = self.wb.active
 
         # celda inicial y celda final del rango a escribir
         def rows_iter(row, num_column, max_col):
@@ -127,6 +154,8 @@ class write_xlsx():
             min_row=row, max_row=row, min_col=num_column, max_col=max_col
             )
             
+            
+            print(type(fila_a_editar))
             # retornamos la validacion de la fila vacia
             fila_validada = self.Empty_row(fila_a_editar)
             
@@ -153,7 +182,6 @@ class write_xlsx():
         validate = {True}
 
         copi_row = copy.copy(list(fila_a_editar))
-        print(copi_row)
         for row in copi_row:
             for cell in row:
                 if cell.value != None:
@@ -163,8 +191,7 @@ class write_xlsx():
             return copi_row
         
         return False            
-            
 
 if __name__ == "__main__":
-    enero = write_xlsx(path_file="./xls/Enero_2022.xlsx")
+    enero = write_xlsx("./xls/Enero_2022.xlsx")
     enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
