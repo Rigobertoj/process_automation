@@ -1,6 +1,7 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
 from typeguard import typechecked
+from functools import reduce
 import os
 import copy
 
@@ -175,18 +176,12 @@ class write_xlsx():
             data,
             fila_a_editar
         ))
-        print(f"value {value}")
         self.wb.save(self.__path_file)
         
     def Empty_row (self, fila_a_editar):        
         copi_row = copy.copy(list(fila_a_editar))
-        
-        for row in copi_row:
-            for cell in row:
-                if cell.value != None:
-                    return False            
-                                    
-        return copi_row
+        check_empty = lambda row: reduce(lambda x, y: x or y.value, row, False)
+        return copi_row if not any(map(check_empty, copi_row)) else False
         
 
 if __name__ == "__main__":
