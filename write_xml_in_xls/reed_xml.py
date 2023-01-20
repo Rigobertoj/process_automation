@@ -411,7 +411,9 @@ class reed_xml :
 
 
     def get_mount(self, root: ET.Element):
-        
+        """
+        Descripcion : metodo que nos permite obtener el monto de los
+        """
         # TODO : Create the doc
 
         mounts = {}
@@ -477,20 +479,56 @@ class reed_xml :
         
         return taxes
     
+class Reed_xml:
+    def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
+        self.xml = path_document
 
+
+    def get_tag(self,root : ET.Element, name_tag: str):
         
+        # Define una función de filtro que compruebe si el nombre de la etiqueta es 'Emisor'
+        def es_emisor(tag):
+            return self.get_name_tag(tag) == name_tag
+    
+        # Obtiene el primer elemento que cumpla la condición utilizando next()
+        try:
+            tag = next(filter(es_emisor, root.iter()))
+        except StopIteration:
+            folio_fiscal = self.__CFDI["Folio_fiscal"]
+            print(f"SpotIteration {folio_fiscal}")
+            return StopIteration
+        return tag
+    
+    
+    def get_file_name(self, xml: str) -> str:
+        """
+        description : funcion que nos permite obtener el folio fiscal del documento CFDI
+
+        params :
+            - xml (str) : ruta donde se aloja el CFDI 
+
+        return (str)  : folio fiscal
+
+        """
+        #abrimos el documento
+        with open(xml) as xml:
+            #obtenemos el nombre del archivo
+            data = xml.name
+            
+            #obtenemos el ultimo elemento de la lista pues ahi esta el folio
+            folio = data.split("/")[-1]
+
+            # retiramos la extencion .xml que coforma los ultimos 4 caracteres
+            return folio[:-4]
             
 
 
 if __name__ == "__main__":
 #CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
     print("--------------------------------------------------------------------------------------------------------------------------------------------")
-    produce_un_error_Complemente = "./read_CFDI/CFDI/enero/056b1d70-7d25-45f6-bd5c-cdbe0adcf6f9.xml"
-    produce_un_error = './read_CFDI/CFDI/enero/052227d9-4d89-4438-b6c1-0dd183dfc4a1.xml'
-    produce_un_error_fecha = "./read_CFDI/CFDI/enero/02f933ce-1f0a-4628-920d-f5bb3ae4921f.xml"
-    CFDI_HONORARIOS = "./read_CFDI/CFDI/testing_CFDI/4ABA0B0C-37D2-4127-9A43-B02C2432F392.xml" 
-
-    DATA = reed_xml(CFDI_HONORARIOS, RFC=RFC)
+    xml = "./read_CFDI/SEPTIEMBRE_CFDI/0DB6C48D-7EAD-49E5-9553-FD9AFFF3C97C.xml"
+    
+    DATA = reed_xml(xml, RFC=RFC)
     data = DATA.get_data()
     print(data["Mount"])
     # dir_path = './CFDI/testing_CFDI'
