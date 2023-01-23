@@ -16,20 +16,20 @@ class CFDI (Reed_xml):
         
         fecha_De_facturacion = self.fecha_facturacion()
         self.conceptos = self.get_conceptos()
-        Clave_de_producto_o_servicio = self.get_clave_prod_serv()
-        Concepto_de_la_factura = self.get_invoice_concept()
+        # Clave_de_producto_o_servicio = self.get_clave_prod_serv()
+        # Concepto_de_la_factura = self.get_invoice_concept()
         
-        print(Clave_de_producto_o_servicio)
+        # print(Clave_de_producto_o_servicio)
         return {
             "Fecha en el estado de cuenta." : None,
             "Fecha de facturación." : fecha_De_facturacion, 
             "Tipo.": None,
             "Clase." : None,
-            "Clave de producto o servicio." : Clave_de_producto_o_servicio,
+            "Clave de producto o servicio." : None,
             "num" : None,
             "Folio fiscal." : None,
             "Nombre." : None,
-            "Concepto." : Concepto_de_la_factura,
+            "Concepto." : None,
             "Subtotal." : None,
             "Descuentos." : None,
             "IEPS." : None,
@@ -50,35 +50,65 @@ class CFDI (Reed_xml):
             self.get_items(self.root, "Certificado")["Fecha"]
             )
         
+    def get_concepto(self, element : ET.Element):
+        return self.get_items(element)
     
-    def get_conceptos(self):
+    
+    def get_conceptos(self):        
         child_root = self.get_childs(self.root)
         conceptos = child_root["Conceptos"]
-        concepto = self.get_items(
-            self.get_childs(conceptos)["Concepto"]
-            )
+                
+        Data_conceptos = list(map(self.get_concepto, list(conceptos)))
+            
+        return list(map(self.compuse_data_conceptos, Data_conceptos))
+    
+        
+    def compuse_data_conceptos (self, data_element : dict):
+        ClaveProdServ = self.get_clave_prod_serv(data_element)
+        Descripcion = self.get_invoice_concept(data_element)
+        Importe = self.get_Importe(data_element)
+        Descuento = self.get_descuento(data_element)
+        Sub_total = self.get_sub_total(data_element)
+        
+        return {
+            "Clave de producto o servicio." : ClaveProdServ,
+            "Concepto" : Descripcion,
+            "Importe" : Importe,
+            "Sub total" : Descuento,
+            "Sub total" : Sub_total,
+            
+        }
         
         
+    
         
-    def get_clave_prod_serv(self):
-        return self.conceptos["ClaveProdServ"]
+    def get_clave_prod_serv(self, data_element : dict):
+        if data_element["ClaveProdServ"]:
+            return data_element["ClaveProdServ"]
+        return None
+    
+    def get_invoice_concept(self,  data_element : dict) -> str:
+        return data_element["Descripcion"]
     
     
-    def get_invoice_concept(self) -> str:
-        return self.conceptos["Descripcion"]
+    def get_Importe(self, data_element : dict) -> str:
+        return data_element["Importe"]
     
     
-    def Importe(self) -> str:
-        return self.conceptos["Importe"]
-    
-    
-    def sub_total(self) -> int :
-        importe = int(self.conceptos["Importe"])
-        if self.conceptos["Descuento"] :
-            descuento = int(self.conceptos["Descuento"])
+    def get_sub_total(self,  data_element : dict) -> float :
+        importe = float(data_element["Importe"])
+        
+        if "Descuento" in data_element:
+            descuento = float(data_element["Descuento"])
             return importe - descuento
         
         return importe 
+    
+    
+    def get_descuento(self, data_element):
+        if "Descuento" in data_element:
+            return data_element["Descuento"]
+        return None
     
     
     
