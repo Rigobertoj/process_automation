@@ -1,4 +1,5 @@
 from functools import reduce
+from typing import Optional, Union
 import xml.etree.cElementTree as ET
 import copy as c
 import os
@@ -82,6 +83,8 @@ class reed_xml :
     def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
         self.xml = path_document
         self.__RFC = RFC.upper()
+        self.tree = ET.parse(self.xml)
+        self.root = self.tree.getroot()
 
 
     def get_tag(self,root : ET.Element, name_tag: str):
@@ -107,8 +110,7 @@ class reed_xml :
         return (dict) : este medoto retorna un diccionario por cada CFDI el cual viene identificadas las propiedades de la clase en la doc de la misma        
         """
         t1 = time.perf_counter()
-        self.tree = ET.parse(self.xml)
-        self.root = self.tree.getroot()
+
         
         Tipo = self.get_tipo_CFDI(root=self.root)
         self.__CFDI["Tipo"] = Tipo
@@ -479,27 +481,104 @@ class reed_xml :
         
         return taxes
     
+def foreach(func : callable, list : list):
+    for i in range(len(list)):
+        func(list[i])
+
+    
+    
 class Reed_xml:
     def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
         self.xml = path_document
+        self.__RFC = RFC.upper()
+        self.tree = ET.parse(self.xml)
+        self.root = self.tree.getroot()
+    
+    
+    def main(self):
+        return self.get_obj_childs(self.root)
+    
+    
+    def get_keys(self, element : ET.Element):
+        """Description obten las kyes de un elemento de un xml
 
+        Params:
+            - element (ET.Element): Es el elemento del cual quieres extraer las claves de sus propiedades
 
-    def get_tag(self,root : ET.Element, name_tag: str):
+        Returnn list : retorna una lista con las keys del elemento
+        """
+        return element.keys()
         
-        # Define una función de filtro que compruebe si el nombre de la etiqueta es 'Emisor'
-        def es_emisor(tag):
-            return self.get_name_tag(tag) == name_tag
     
-        # Obtiene el primer elemento que cumpla la condición utilizando next()
-        try:
-            tag = next(filter(es_emisor, root.iter()))
-        except StopIteration:
-            folio_fiscal = self.__CFDI["Folio_fiscal"]
-            print(f"SpotIteration {folio_fiscal}")
-            return StopIteration
+    def get_values(self, element : ET.Element):
+        """descripcion : metodo que nos otorga los valores de los atributos de un elemento xml
+
+        Params:
+            element (ET.Element): Es el elemento de un xml del cual se le extraeran sus valores de los atributos
+
+        Returns:
+            list: lista de datos con todos los valores de los atributos
+        """
+        return list(map(element.get, element.keys()))
+    
+    
+    def get_items(self, element : ET.Element, condition : Optional[Union[str, int, bool]] = None) -> dict[str : str]:
+        """descripcion : metodo que nos permite obtener los nombre y valores del conjunto de atributos que tiene un elemento xml
+        
+        Params:
+            - element (ET.Element): elemento al cual se le extraeran los datos
+            - condition (str | int | bool) condicion la cual sera aplicada a los nombre de los atributos
+        
+        Return (dict) : diccionario con los datos de los nombre y valores de los atributos de un elemento xml
+        """
+        keys = self.get_keys(element)
+        values = self.get_values(element)
+        return {key: value for key, value in zip(keys, values) if key != condition}
+    
+    
+    def get_name_child_tags(self, element : ET.Element) -> list[str]:
+        """descripcion : metodo que nos proporciona los tags (nombres) de los elementos hijo 
+
+        Args:
+            element (ET.Element): elemento del cual se extraeran los tag (nombre) de los hijos 
+
+        Returns (list) : lista con todos los nombre de los hijos
+        """
+        return list(map(self.get_name_tag, element))
+        
+        
+    def get_obj_childs(self, element : ET.Element):
+        """descripcion : Metodo que nos retorna una lista con los objetos hijos de un elemento
+
+        Params:
+            - element (ET.Element): Elemento del cual se extraen los hijos
+
+        Return (list) : lista de objetos con los hijos de un elemento 
+        """
+        return list(map(lambda e : e, element))
+    
+        
+    def get_childs(self, element : ET.Element):
+        child_tags = self.get_name_child_tags(element)
+        child_objs = self.get_obj_childs(element)
+        return {key: value for key, value in zip(child_tags, child_objs)}
+    
+    
+    
+    def get_name_tag(self, element_xml : ET.Element):
+        """
+        Descripcion : Metodo que nos prmite obtener el nombre de alguna etiqueta del CFDI: ejemplo :
+            - {http://www.sat.gob.mx/cfd/3}Retenciones -> Retenciones
+
+        Params : 
+            element_xml (ET.Element) : Este es el elemento del cual quiere obtener su etiqueta o tag
+
+        return (str) : Retorna el nombre de la etiqueda o tag del elemento introducido
+        """
+        tag = element_xml.tag.split("}")[1]
         return tag
-    
-    
+
+        
     def get_file_name(self, xml: str) -> str:
         """
         description : funcion que nos permite obtener el folio fiscal del documento CFDI
@@ -520,17 +599,20 @@ class Reed_xml:
 
             # retiramos la extencion .xml que coforma los ultimos 4 caracteres
             return folio[:-4]
-            
+        
+
 
 
 if __name__ == "__main__":
 #CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
     print("--------------------------------------------------------------------------------------------------------------------------------------------")
     xml = "./read_CFDI/SEPTIEMBRE_CFDI/0DB6C48D-7EAD-49E5-9553-FD9AFFF3C97C.xml"
+    Nomina = "./read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
     
-    DATA = reed_xml(xml, RFC=RFC)
-    data = DATA.get_data()
-    print(data["Mount"])
+    
+    DATA = Reed_xml(Nomina, RFC=RFC)
+    data = DATA.main()
+    print(data)
     # dir_path = './CFDI/testing_CFDI'
     # xml = reed_multiples_xml(dir_path, RFC=RFC)
 
