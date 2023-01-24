@@ -550,7 +550,25 @@ class Reed_xml:
 
         Returns (list) : lista con todos los nombre de los hijos
         """
-        return list(map(self.get_name_tag, element))
+        conjunto_tags = {}
+        
+        def get_names_tag(element : ET.Element):
+            
+            tag = self.get_name_tag(element)
+        
+            if tag not in conjunto_tags:
+                conjunto_tags[tag] = 1
+                return tag
+        
+            conjunto_tags[tag] += 1
+            return f"{tag} {conjunto_tags[tag]}"
+        
+        return list(map(get_names_tag, element))
+        
+
+        
+        
+        
         
         
     def get_obj_childs(self, element : ET.Element):
