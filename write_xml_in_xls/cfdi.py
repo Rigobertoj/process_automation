@@ -14,7 +14,7 @@ class CFDI (Reed_xml):
         self.root_attrs = self.get_items(self.root)
         
     def test(self):
-        print(self.get_name())
+        print(self.get_taxes_acreditables())
         
         
     def main(self):
@@ -30,6 +30,8 @@ class CFDI (Reed_xml):
         Descuentos = float(self.get_descuento())
         sub_total = float(self.get_sub_total())
         total = float(self.get_total())
+        
+        
         return {
             "Fecha en el estado de cuenta." : None,
             "Fecha de facturación." : fecha_De_facturacion, 
@@ -66,11 +68,17 @@ class CFDI (Reed_xml):
         
     
     def get_name(self):
+        Emisor, Receptor = self.Emisor_receptor()        
+        return Receptor["Nombre"] if Emisor["Rfc"] == self.__RFC__ else Emisor["Nombre"]
+        
+    
+    def Emisor_receptor(self):
         Emisor = self.get_items(self.get_childs(self.root)["Emisor"])
         Receptor = self.get_items(self.get_childs(self.root)["Receptor"])
         
-        return Receptor["Nombre"] if Emisor["Rfc"] == self.__RFC__ else Emisor["Nombre"]
-        
+        return (Emisor, 
+                Receptor)
+    
         
     def get_concepto(self, element : ET.Element):
         return self.get_items(element)
@@ -171,17 +179,57 @@ class CFDI (Reed_xml):
     def get_total(self):
         return self.root_attrs["Total"]
     
+    
+    def get_traslados(self):
+        root = self.get_items(self.get_childs(self.root))
+        try :
+            Impuestos = self.get_childs(root["Impuestos"])
+            
+            if "Traslados" in Impuestos :
+            
+                traslados = Impuestos["Traslados"]
+                Importe = self.get_items(self.get_childs(traslados)["Traslado"])
+                return Importe["Importe"]
+        
+        except KeyError:
+            return None
+        
+        
+    def get_retenciones(self):
+        root = self.get_items(self.get_childs(self.root))
+        try :
+            Impuestos = self.get_childs(root["Impuestos"])
+            
+            if "Retenciones" in Impuestos :
+                Retenciones = Impuestos["Retenciones"]
+                             
+                childs = self.get_childs(Retenciones)
+                
+                Retencion = list(map(self.get_items, list(childs.values())))
+                
+                return {objeto['Impuesto'] : objeto['Importe'] for objeto in Retencion} 
+            return None
+        
+        except KeyError:
+            return None
+    
+        
+        
+        
+        
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
     fact_pago_emitida = "read_CFDI/2021/Enero/Emitidas/2f99dd73-df61-4481-bc02-34010db1fd3a.xml"
     fact_nomina = "read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
+    fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
     
-    cfdi = CFDI(fact_muchos_conceptos,RFC)
-    data = cfdi.main()
-    for key, value in data.items():
-        print(
-        f"""
-        {key} : {value}
-        """
-        )
+    
+    cfdi = CFDI(fact_honorarios,RFC)
+    data = cfdi.test()
+    # for key, value in data.items():
+    #     print(
+    #     f"""
+    #     {key} : {value}
+    #     """
+    #     )
