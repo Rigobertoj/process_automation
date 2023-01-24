@@ -14,7 +14,7 @@ class CFDI (Reed_xml):
         self.root_attrs = self.get_items(self.root)
         
     def test(self):
-        print(self.get_items(self.root))   
+        print(self.get_name())
         
         
     def main(self):
@@ -30,6 +30,7 @@ class CFDI (Reed_xml):
             
         folio_fiscal = self.get_file_name()
         folio_de_la_factura = self.get_invoice_folio()
+        Name = self.get_name()
         return {
             "Fecha en el estado de cuenta." : None,
             "Fecha de facturación." : fecha_De_facturacion, 
@@ -38,9 +39,9 @@ class CFDI (Reed_xml):
             "Clave de producto o servicio." : self.conceptos["Clave de producto o servicio."],
             "num" : folio_de_la_factura,
             "Folio fiscal." : folio_fiscal,
-            "Nombre." : None,
+            "Nombre." : Name,
             "Concepto." : self.conceptos["Concepto"],
-            "Subtotal." : self.conceptos["Importe"],
+            "Subtotal." : None,
             "Descuentos." : Descuentos,
             "IEPS." : None,
             "IVA 16%." : None,
@@ -65,8 +66,13 @@ class CFDI (Reed_xml):
         return self.root_attrs["Folio"]
         
     
-    
-    
+    def get_name(self):
+        Emisor = self.get_items(self.get_childs(self.root)["Emisor"])
+        Receptor = self.get_items(self.get_childs(self.root)["Receptor"])
+        
+        return Receptor["Nombre"] if Emisor["Rfc"] == self.__RFC__ else Emisor["Nombre"]
+        
+        
     def get_concepto(self, element : ET.Element):
         return self.get_items(element)
     
@@ -163,7 +169,7 @@ if __name__ == '__main__':
     fact_nomina = "read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     
-    cfdi = CFDI(fact_nomina,RFC)
+    cfdi = CFDI(fact_muchos_conceptos,RFC)
     data = cfdi.test()
     # for key, value in data.items():
     #     print(
