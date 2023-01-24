@@ -488,15 +488,21 @@ def foreach(func : callable, list : list):
     
     
 class Reed_xml:
-    def __init__(self, path_document : str, RFC : str, nombre = " ", ) -> None:
+    def __init__(self, path_document : str) -> None:
+        if not self.validate_path(path_document): 
+            raise ValueError("La ruta especificada no es válida.")
+        
         self.xml = path_document
-        self.__RFC = RFC.upper()
         self.tree = ET.parse(self.xml)
         self.root = self.tree.getroot()
     
     
     def main(self):
         return self.get_obj_childs(self.root)
+    
+    
+    def validate_path(self, path: str):
+        return os.path.exists(path)
     
     
     def get_keys(self, element : ET.Element):
@@ -558,7 +564,15 @@ class Reed_xml:
         return list(map(lambda e : e, element))
     
         
-    def get_childs(self, element : ET.Element):
+    def get_childs(self, element : ET.Element) -> dict[str : ET.Element]:
+        """descripcion : metodo que nos permite obtener los hijos de un elemento relacionados con tu name tag
+
+        Args:
+            element (ET.Element): elemento del cual se extraeran los hijos (objetos)
+
+        Returns:
+            dict[str : ET.Element]: dicc el cual tiene los hijos los hijos de un elemento relacionados con tu name tag
+        """
         child_tags = self.get_name_child_tags(element)
         child_objs = self.get_obj_childs(element)
         return {key: value for key, value in zip(child_tags, child_objs)}
