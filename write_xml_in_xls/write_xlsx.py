@@ -39,7 +39,19 @@ class write_xlsx():
         """
                     
         if self._is_valid_path(file_name):
-            self._load_file(file_name) if os.path.exists(file_name) else self._create_file(file_name)
+            
+            def create_document():
+                self._create_file(file_name)
+                self.wb.save(file_name)
+                
+            # self._load_file(file_name) if os.path.exists(file_name) else create_document()
+            if os.path.exists(file_name):
+                self._load_file(file_name)
+            else:
+                create_document()
+                self._load_file(file_name)
+                
+                
             self.__path_file = file_name
             return
             
@@ -104,7 +116,13 @@ class write_xlsx():
         """
         self.sheet_name = self.wb[sheet_name]
         return self.sheet_name
-
+    
+    
+    def create_new_sheet(self, name_sheet : str):
+            self.wb.active
+            self.wb.create_sheet(name_sheet)
+            self.wb.save(self.__path_file)
+    
 
     def write_row_by_range(self, name_sheet :str, initial_cell : str, data = list, ):
         
@@ -147,9 +165,12 @@ class write_xlsx():
             self.ws = self.wb[name_sheet]
         else:
             #si no creamos una hoja con el nombre del argumento 
-            self.ws = self.wb.create_sheet(name_sheet)
+            # self.wb.create_sheet(name_sheet)
+            # self.ws = self.wb.active
+            # print(self.ws.name)
             self.ws = self.wb.active
-
+            self.ws.title = name_sheet
+                        
         # celda inicial y celda final del rango a escribir
         def rows_iter(row, initial_column, max_col):
             fila_a_editar = self.ws.iter_rows(
@@ -177,6 +198,7 @@ class write_xlsx():
         ))
         self.wb.save(self.__path_file)
         
+    
     def Empty_row (self, fila_a_editar):        
         copi_row = copy.copy(list(fila_a_editar))
         check_empty = lambda row: reduce(lambda x, y: x or y.value, row, False)
@@ -192,5 +214,3 @@ class write_xlsx():
 if __name__ == "__main__":
     enero = write_xlsx("./xls/Enero_2022.xlsx")
     enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
-    result = run(["pwd"], stdout=PIPE)
-    print(result)
