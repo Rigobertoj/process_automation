@@ -593,7 +593,7 @@ class Reed_xml:
         return tag
 
         
-    def get_file_name(self, xml: str) -> str:
+    def get_file_name(self) -> str:
         """
         description : funcion que nos permite obtener el folio fiscal del documento CFDI
 
@@ -604,7 +604,7 @@ class Reed_xml:
 
         """
         #abrimos el documento
-        with open(xml) as xml:
+        with open(self.xml) as xml:
             #obtenemos el nombre del archivo
             data = xml.name
             
@@ -614,7 +614,6 @@ class Reed_xml:
             # retiramos la extencion .xml que coforma los ultimos 4 caracteres
             return folio[:-4]
         
-
 
 
 if __name__ == "__main__":

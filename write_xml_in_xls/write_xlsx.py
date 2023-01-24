@@ -2,6 +2,7 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 from typeguard import typechecked
 from functools import reduce
+from subprocess import run, PIPE
 import os
 import copy
 
@@ -180,8 +181,16 @@ class write_xlsx():
         copi_row = copy.copy(list(fila_a_editar))
         check_empty = lambda row: reduce(lambda x, y: x or y.value, row, False)
         return copi_row if not any(map(check_empty, copi_row)) else False
+    
+    
+    def delete_wb(self):
+        #TODO : Encontrar el porque falla esta madre 
+        print(self.__path_file)
+        run(["rm", "-r", f"{self.__path_file}"])
         
 
 if __name__ == "__main__":
     enero = write_xlsx("./xls/Enero_2022.xlsx")
     enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
+    result = run(["pwd"], stdout=PIPE)
+    print(result)

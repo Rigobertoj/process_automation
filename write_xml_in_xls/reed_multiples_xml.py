@@ -68,9 +68,8 @@ class multi_reed_xml():
         return self.__data
 
 if __name__ == '__main__':
-    dir_path = ".read_CFDI/CFDI/enero"
+    print("ENTER")
+    dir_path = "./read_CFDI/2022/AGOSTO_CFDI/"
     data = multi_reed_xml(dir_path, RFC)
-    # print(data.get_data_from_multiples_xml())
-    # for item in data.get_data():
-    #     print("________________________________________________________")
-    #     print(item)
+    data_m = data.get_data_from_multiples_xml()
+    print(data_m)

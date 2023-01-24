@@ -1,3 +1,5 @@
-import read_CFDI.reed_xml as xml
+import subprocess
 
-print(xml.RFC)
+print("DIr")
+result = subprocess.run(['dir'], stdout=subprocess.PIPE)
+print(result.stdout.decode())
