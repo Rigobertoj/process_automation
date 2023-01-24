@@ -11,6 +11,11 @@ class CFDI (Reed_xml):
         super().__init__(path_document)
         self.__RFC__ = RFC
         self.__Nombre__ = nombre
+        self.root_attrs = self.get_items(self.root)
+        
+    def test(self):
+        print(self.get_items(self.root))   
+        
         
     def main(self):
         
@@ -23,15 +28,16 @@ class CFDI (Reed_xml):
         else :
             Descuentos = None
             
-        
+        folio_fiscal = self.get_file_name()
+        folio_de_la_factura = self.get_invoice_folio()
         return {
             "Fecha en el estado de cuenta." : None,
             "Fecha de facturación." : fecha_De_facturacion, 
             "Tipo.": None,
             "Clase." : None,
             "Clave de producto o servicio." : self.conceptos["Clave de producto o servicio."],
-            "num" : None,
-            "Folio fiscal." : None,
+            "num" : folio_de_la_factura,
+            "Folio fiscal." : folio_fiscal,
             "Nombre." : None,
             "Concepto." : self.conceptos["Concepto"],
             "Subtotal." : self.conceptos["Importe"],
@@ -54,6 +60,13 @@ class CFDI (Reed_xml):
             self.get_items(self.root, "Certificado")["Fecha"]
             )
         
+        
+    def get_invoice_folio(self):
+        return self.root_attrs["Folio"]
+        
+    
+    
+    
     def get_concepto(self, element : ET.Element):
         return self.get_items(element)
     
@@ -151,10 +164,10 @@ if __name__ == '__main__':
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     
     cfdi = CFDI(fact_nomina,RFC)
-    data = cfdi.main()
-    for key, value in data.items():
-        print(
-        f"""
-        {key} : {value}
-        """
-        )
+    data = cfdi.test()
+    # for key, value in data.items():
+    #     print(
+    #     f"""
+    #     {key} : {value}
+    #     """
+    #     )
