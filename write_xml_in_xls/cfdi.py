@@ -22,15 +22,14 @@ class CFDI (Reed_xml):
         fecha_De_facturacion = self.fecha_facturacion()
         self.conceptos = self.get_conceptos()
         print(self.conceptos)
-        
-        if "Descuentos" in self.conceptos :
-            Descuentos = self.conceptos["Descuentos"]
-        else :
-            Descuentos = None
-            
+                    
         folio_fiscal = self.get_file_name()
         folio_de_la_factura = self.get_invoice_folio()
         Name = self.get_name()
+        
+        Descuentos = float(self.get_descuento())
+        sub_total = float(self.get_sub_total())
+        total = float(self.get_total())
         return {
             "Fecha en el estado de cuenta." : None,
             "Fecha de facturación." : fecha_De_facturacion, 
@@ -41,13 +40,13 @@ class CFDI (Reed_xml):
             "Folio fiscal." : folio_fiscal,
             "Nombre." : Name,
             "Concepto." : self.conceptos["Concepto"],
-            "Subtotal." : None,
+            "Subtotal." : sub_total,
             "Descuentos." : Descuentos,
             "IEPS." : None,
             "IVA 16%." : None,
             "Ret. IVA." : None ,
             "Ret. ISR." : None,
-            "Total." : None, 
+            "Total." : total, 
             "Bancos.": None,
             "Folio relacionado" : None,
         }
@@ -98,8 +97,8 @@ class CFDI (Reed_xml):
         ClaveProdServ = self.get_clave_prod_serv(data_element)
         Descripcion = self.get_invoice_concept(data_element)
         Importe = self.get_Importe(data_element)
-        Descuento = self.get_descuento(data_element)
-        Sub_total = self.get_sub_total(data_element)
+        Descuento = self.get_concep_descuento(data_element)
+        Sub_total = self.get_sub_total_concept(data_element)
         
         return {
             "Clave de producto o servicio." : ClaveProdServ,
@@ -145,7 +144,7 @@ class CFDI (Reed_xml):
         return data_element["Importe"]
     
     
-    def get_sub_total(self,  data_element : dict) -> float :
+    def get_sub_total_concept(self,  data_element : dict) -> float :
         importe = float(data_element["Importe"])
         
         if "Descuento" in data_element:
@@ -155,13 +154,22 @@ class CFDI (Reed_xml):
         return importe 
     
     
-    def get_descuento(self, data_element):
+    def get_concep_descuento(self, data_element):
         if "Descuento" in data_element:
             return data_element["Descuento"]
         return None
     
-
     
+    def get_sub_total(self):
+        return self.root_attrs["SubTotal"]
+
+
+    def get_descuento(self):
+        return self.root_attrs["Descuento"] if "Descuento" in self.root_attrs else 0
+    
+    
+    def get_total(self):
+        return self.root_attrs["Total"]
     
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
@@ -170,10 +178,10 @@ if __name__ == '__main__':
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     
     cfdi = CFDI(fact_muchos_conceptos,RFC)
-    data = cfdi.test()
-    # for key, value in data.items():
-    #     print(
-    #     f"""
-    #     {key} : {value}
-    #     """
-    #     )
+    data = cfdi.main()
+    for key, value in data.items():
+        print(
+        f"""
+        {key} : {value}
+        """
+        )
