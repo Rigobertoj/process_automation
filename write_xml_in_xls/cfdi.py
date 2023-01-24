@@ -14,7 +14,7 @@ class CFDI (Reed_xml):
         self.root_attrs = self.get_items(self.root)
         
     def test(self):
-        print(self.get_taxes_acreditables())
+        print(self.get_taxes())
         
         
     def main(self):
@@ -73,6 +73,11 @@ class CFDI (Reed_xml):
         
     
     def Emisor_receptor(self):
+        """Descripcion : Metodo que nos permite extraer 2 diccionarios con los atributos de los elementos Emisor y Receptor
+
+        Returns:
+            Tubla[Dict, Dict]: Tupla con el diccionario Emisor y Receptor en ese orden
+        """
         Emisor = self.get_items(self.get_childs(self.root)["Emisor"])
         Receptor = self.get_items(self.get_childs(self.root)["Receptor"])
         
@@ -180,7 +185,7 @@ class CFDI (Reed_xml):
         return self.root_attrs["Total"]
     
     
-    def get_traslados(self):
+    def get_traslados(self) -> int:
         root = self.get_items(self.get_childs(self.root))
         try :
             Impuestos = self.get_childs(root["Impuestos"])
@@ -189,13 +194,15 @@ class CFDI (Reed_xml):
             
                 traslados = Impuestos["Traslados"]
                 Importe = self.get_items(self.get_childs(traslados)["Traslado"])
-                return Importe["Importe"]
+                return float(Importe["Importe"])
+            
+            return None
         
         except KeyError:
             return None
         
         
-    def get_retenciones(self):
+    def get_retenciones(self) -> dict[str]:
         root = self.get_items(self.get_childs(self.root))
         try :
             Impuestos = self.get_childs(root["Impuestos"])
@@ -207,14 +214,34 @@ class CFDI (Reed_xml):
                 
                 Retencion = list(map(self.get_items, list(childs.values())))
                 
-                return {objeto['Impuesto'] : objeto['Importe'] for objeto in Retencion} 
+                return {objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion} 
             return None
         
         except KeyError:
             return None
     
         
+    def get_taxes(self):
+        Retenciones = self.get_retenciones()
+        print(Retenciones)
+        IVA, Ret_IVA, Ret_ISR = [None, None, None]
         
+        if Retenciones != None :
+            Ret_IVA = Retenciones['002'] if '002' in Retenciones else None
+            Ret_ISR = Retenciones['001'] if '001' in Retenciones else None
+            
+        
+        
+        print(self.get_retenciones())
+        
+        IVA = self.get_traslados()
+        Emisor, Receptor = self.Emisor_receptor()
+        if Receptor["Rfc"] == self.__RFC__:
+            return {
+                "IVA" : IVA,
+                "Ret_IVA" : Ret_IVA,
+                "Ret_ISR" : Ret_ISR
+            }
         
         
 if __name__ == '__main__':
@@ -223,13 +250,13 @@ if __name__ == '__main__':
     fact_nomina = "read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
+    fact_nomina_2 = "./read_CFDI/Nomina/"
     
-    
-    cfdi = CFDI(fact_honorarios,RFC)
-    data = cfdi.test()
-    # for key, value in data.items():
-    #     print(
-    #     f"""
-    #     {key} : {value}
-    #     """
-    #     )
+    cfdi = CFDI(fact_nomina,RFC)
+    data = cfdi.main()
+    for key, value in data.items():
+        print(
+        f"""
+        {key} : {value}
+        """
+        )
