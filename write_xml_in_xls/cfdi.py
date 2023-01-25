@@ -12,6 +12,7 @@ class CFDI (Reed_xml):
         self.__RFC__ = RFC
         self.__Nombre__ = nombre
         self.root_attrs = self.get_items(self.root)
+        print(self.root_attrs.get("Folio"))
         
     def test(self):
         print(self.get_taxes())
@@ -31,6 +32,13 @@ class CFDI (Reed_xml):
         sub_total = float(self.get_sub_total())
         total = float(self.get_total())
         
+        IVA, Ret_IVA, Ret_ISR = self.get_taxes()
+        
+        if self.searh_in_complement("Nomina"):
+            Ret_ISR, Descuentos = self.get_data_nominas()
+        
+        if self.searh_in_complement("Pagos"):
+            print("Pagos")
         
         return {
             "Fecha en el estado de cuenta." : None,
@@ -45,9 +53,9 @@ class CFDI (Reed_xml):
             "Subtotal." : sub_total,
             "Descuentos." : Descuentos,
             "IEPS." : None,
-            "IVA 16%." : None,
-            "Ret. IVA." : None ,
-            "Ret. ISR." : None,
+            "IVA 16%." : IVA,
+            "Ret. IVA." : Ret_IVA ,
+            "Ret. ISR." : Ret_ISR,
             "Total." : total, 
             "Bancos.": None,
             "Folio relacionado" : None,
@@ -64,7 +72,7 @@ class CFDI (Reed_xml):
         
         
     def get_invoice_folio(self):
-        return self.root_attrs["Folio"]
+        return self.root_attrs.get("Folio")
         
     
     def get_name(self):
@@ -189,10 +197,9 @@ class CFDI (Reed_xml):
         root = self.get_items(self.get_childs(self.root))
         try :
             Impuestos = self.get_childs(root["Impuestos"])
+            traslados = Impuestos.get("Traslados")
             
-            if "Traslados" in Impuestos :
-            
-                traslados = Impuestos["Traslados"]
+            if traslados:
                 Importe = self.get_items(self.get_childs(traslados)["Traslado"])
                 return float(Importe["Importe"])
             
@@ -222,37 +229,84 @@ class CFDI (Reed_xml):
     
         
     def get_taxes(self):
-        Retenciones = self.get_retenciones()
-        print(Retenciones)
-        IVA, Ret_IVA, Ret_ISR = [None, None, None]
+        """Descripcion : metodo que nos permite obtener de manera estructurada los impuestos de la factura
+
+        Returns:
+            Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
+        """
         
-        if Retenciones != None :
-            Ret_IVA = Retenciones['002'] if '002' in Retenciones else None
-            Ret_ISR = Retenciones['001'] if '001' in Retenciones else None
+        retenciones = self.get_retenciones() or {}
+        iva = self.get_traslados() or None
+
+        return iva, retenciones.get("002"), retenciones.get("001")
+        
             
+    
+    
+    def searh_in_complement(self, name_tag : str):
+        try:
+            child_root = self.get_items(self.get_childs(self.root))
+            child_complemento = self.get_items(self.get_childs(child_root.get("Complemento")))
+            return name_tag in child_complemento
+            
+        except (AttributeError, KeyError):
+            return False 
+    
+    
+    def get_data_nominas(self):
+        """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le realizan a la nomina en cada una de las operaciones
+        
+        Return (Tuple[])
+        
+        """
+        
+        Impuestos = {}
+        get_data = lambda e : self.get_items(self.get_childs(e))
+        try :
+            
+            Complemento = get_data(self.root)["Complemento"]
+            concept_complemento = get_data(Complemento)
+            Data_nomina = get_data(concept_complemento["Nomina"])
+            Deducciones = get_data(Data_nomina["Deducciones"])
+            
+            data_deducciones = list(
+                map(self.get_items, list(Deducciones.values()))
+                )           
+        except AttributeError:
+            return None
+        
+        Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
         
         
-        print(self.get_retenciones())
+        ISR = float(Impuestos.get("002"))    
+        IMSS = float(Impuestos.get("004"))
+            
+        return ISR, IMSS
         
-        IVA = self.get_traslados()
-        Emisor, Receptor = self.Emisor_receptor()
-        if Receptor["Rfc"] == self.__RFC__:
-            return {
-                "IVA" : IVA,
-                "Ret_IVA" : Ret_IVA,
-                "Ret_ISR" : Ret_ISR
-            }
+    def get_folio_relaciones(self):
+        childs_root = self.get_childs(self.root).get("Complemento")
+        if childs_root in None:
+            return None
+        
+        childs_root
         
         
-if __name__ == '__main__':
+        
+        
+        
+        
+        
+    
+if __name__ == '__main__' :
+        
     RFC = "PPR0610168Z1"
     fact_pago_emitida = "read_CFDI/2021/Enero/Emitidas/2f99dd73-df61-4481-bc02-34010db1fd3a.xml"
     fact_nomina = "read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
-    fact_nomina_2 = "./read_CFDI/Nomina/"
+    fact_nomina_2 = "./read_CFDI/Nomina/E211FFAB-D67D-4373-968E-83C02741628F.xml"
     
-    cfdi = CFDI(fact_nomina,RFC)
+    cfdi = CFDI(fact_pago_emitida,RFC)
     data = cfdi.main()
     for key, value in data.items():
         print(
