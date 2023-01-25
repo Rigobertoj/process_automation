@@ -477,7 +477,6 @@ class reed_xml :
                     taxes["Retenciones IVA"] = impuesto.attrib["Importe"]
                 if "001" in impuesto.attrib["Impuesto"]:
                     taxes["Retenciones ISR  "] = impuesto.attrib["Importe"]
-        print(taxes)
         
         return taxes
     

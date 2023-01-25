@@ -185,12 +185,11 @@ class write_xlsx():
             
             return fila_validada if fila_validada else rows_iter(row + 1, initial_column, max_col)
 
-            
         fila_a_editar = rows_iter(row, initial_column, max_col)
+        print(fila_a_editar)    
         fila_a_editar = fila_a_editar[0]
-        
-        print(fila_a_editar)
-        
+        print(fila_a_editar)    
+                
         value = list(
             map(asigacion_de_data, 
             data,
@@ -213,4 +212,6 @@ class write_xlsx():
 
 if __name__ == "__main__":
     enero = write_xlsx("./xls/Enero_2022.xlsx")
-    enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
+    table =  [[1,2],[1,2]]
+    for element in table:
+        enero.write_row_by_range("Clasificacion de gastos", "A2",element)
