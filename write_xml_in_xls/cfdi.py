@@ -15,7 +15,7 @@ class CFDI (Reed_xml):
         print(self.root_attrs.get("Folio"))
         
     def test(self):
-        print(self.get_taxes())
+        print(self.get_folio_relaciones())
         
         
     def main(self):
@@ -37,8 +37,8 @@ class CFDI (Reed_xml):
         if self.searh_in_complement("Nomina"):
             Ret_ISR, Descuentos = self.get_data_nominas()
         
-        if self.searh_in_complement("Pagos"):
-            print("Pagos")
+        
+        Folio_fiscal_relacionado = self.get_folio_relaciones()
         
         return {
             "Fecha en el estado de cuenta." : None,
@@ -58,7 +58,7 @@ class CFDI (Reed_xml):
             "Ret. ISR." : Ret_ISR,
             "Total." : total, 
             "Bancos.": None,
-            "Folio relacionado" : None,
+            "Folio relacionado" : Folio_fiscal_relacionado,
         }
     
     def convert_type_time(self, time_string : str):
@@ -158,11 +158,11 @@ class CFDI (Reed_xml):
         return None
     
     def get_invoice_concept(self,  data_element : dict) -> str:
-        return data_element["Descripcion"]
+        return data_element.get("Descripcion")
     
     
     def get_Importe(self, data_element : dict) -> str:
-        return data_element["Importe"]
+        return data_element.get("Importe")
     
     
     def get_sub_total_concept(self,  data_element : dict) -> float :
@@ -176,13 +176,11 @@ class CFDI (Reed_xml):
     
     
     def get_concep_descuento(self, data_element):
-        if "Descuento" in data_element:
-            return data_element["Descuento"]
-        return None
+        return data_element.get("Descuento")
     
     
     def get_sub_total(self):
-        return self.root_attrs["SubTotal"]
+        return self.root_attrs.get("SubTotal")
 
 
     def get_descuento(self):
@@ -278,20 +276,20 @@ class CFDI (Reed_xml):
         Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
         
         
-        ISR = float(Impuestos.get("002"))    
-        IMSS = float(Impuestos.get("004"))
-            
+        ISR = Impuestos.get("002")
+        IMSS = Impuestos.get("004")
+
         return ISR, IMSS
         
     def get_folio_relaciones(self):
-        childs_root = self.get_childs(self.root).get("Complemento")
-        if childs_root in None:
+        try :
+            return next(
+                filter(
+                    lambda element: element.tag == "{http://www.sat.gob.mx/Pagos}DoctoRelacionado", self.root.iter()
+                    )
+                ).get("IdDocumento")
+        except StopIteration :
             return None
-        
-        childs_root
-        
-        
-        
         
         
         
@@ -306,11 +304,9 @@ if __name__ == '__main__' :
     fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
     fact_nomina_2 = "./read_CFDI/Nomina/E211FFAB-D67D-4373-968E-83C02741628F.xml"
     
-    cfdi = CFDI(fact_pago_emitida,RFC)
+    cfdi = CFDI(fact_muchos_conceptos,RFC)
     data = cfdi.main()
     for key, value in data.items():
         print(
         f"""
-        {key} : {value}
-        """
-        )
+        {key} : {value}""")
