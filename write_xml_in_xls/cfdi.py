@@ -16,7 +16,7 @@ class CFDI (Reed_xml):
         print(self.root_attrs.get("Folio"))
         
     def test(self):
-        print(self.get_retenciones())
+        print(self.get_taxes())
         
         
     def main(self):
@@ -195,14 +195,21 @@ class CFDI (Reed_xml):
     def get_retenciones(self) -> int:
         try :
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Retenciones")
             
-            if Traslados:        
+            if not Impuestos:        
                 return None
             
-            print("Traslados")            
-        
+            Retenciones = Impuestos.find(f"{self.__URL_CFDI__}Retenciones")
+            
+            if not Retenciones:
+                return None
+            
+            elements = self.get_childs(Traslados)
+            data_elements = list(map(self.get_items, list(elements.values())))
+            return {obj["Impuesto"] : obj["Importe"] for obj in data_elements}
+            
         except KeyError or AttributeError:
+            print(F"ERROR: get_retenciones -> {self.get_retenciones()}")
             return None
         
     def search_tag(self, name_tag : str, element : ET.Element):
@@ -217,20 +224,26 @@ class CFDI (Reed_xml):
         
     def get_traslado(self) -> dict[str]:
         try :
+            
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
-            Traslado = self.get_childs(Traslados)       
             
             if not Impuestos:
                 return None
+            
+            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
+            Traslado = self.get_childs(Traslados)       
+            
+
         
             Retencion = list(map(self.get_items, list(Traslado.values())))
             data_traslados= list({objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion}.values())
             return reduce( lambda acc, current_value : acc + current_value, data_traslados) 
-        except KeyError:
+        except KeyError or AttributeError:
+            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
             return None
         
         except StopIteration :
+            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
             return None
     
         
@@ -241,10 +254,10 @@ class CFDI (Reed_xml):
             Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
         """
         
-        traslado = self.get_traslado()
-        ret = self.get_retenciones() or None
+        traslado = self.get_traslado() 
+        ret = self.get_retenciones() or {}
 
-        return traslado 
+        return traslado, ret.get("002"), ret.get("001"),
         
             
     
@@ -279,6 +292,7 @@ class CFDI (Reed_xml):
                 map(self.get_items, list(Deducciones.values()))
                 )           
         except AttributeError:
+            
             return None
         
         Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
@@ -312,12 +326,11 @@ if __name__ == '__main__' :
     fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
     fact_nomina_2 = "./read_CFDI/Nomina/E211FFAB-D67D-4373-968E-83C02741628F.xml"
     problemas_iva = "read_CFDI/2021/Enero/Recibidas/26cadc4a-b591-4912-911e-20a57252de24.xml"
+    Problemas_complemento = "read_CFDI/2021/Enero/Recibidas/1ab75101-13d5-4a88-ab93-3e123df5b38b.xml"
     
-    
-    cfdi = CFDI(problemas_iva,RFC)
-    data = cfdi.get_taxes()
-    print(data)
-    # for key, value in data.items():
-    #     print(
-    #     f"""
-    #     {key} : {value}""")
+    cfdi = CFDI(Problemas_complemento,RFC)
+    data = cfdi.main()
+    for key, value in data.items():
+        print(
+        f"""
+        {key} : {value}""")

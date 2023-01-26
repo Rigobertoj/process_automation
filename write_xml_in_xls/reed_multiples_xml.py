@@ -45,18 +45,19 @@ class multi_reed_xml():
             xml = CFDI(file, self.RFC)
             
             data = xml.main()         
-            # print(f"Folio fiscal {folio_fiscal}")
+            print(f"Folio fiscal {data}")
             self.__data__.append(data)
 
         return self.__data__
 
     def get_data(self):
         self.get_data_from_multiples_xml()
+        print(self.__data__)
         return self.__data__
 
 if __name__ == '__main__':
     print("ENTER")
-    dir_path = "./read_CFDI/2021/Enero/Emitidas"
+    dir_path = "./read_CFDI/2021/Enero/Recibidas"
     data = multi_reed_xml(dir_path, RFC)
     data_m = data.get_data()
     print(data_m)

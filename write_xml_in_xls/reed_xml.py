@@ -6,7 +6,6 @@ import os
 import time
 import sys
 
-
 RFC = "PPR0610168Z1"
 class reed_xml :
     """
@@ -638,9 +637,9 @@ if __name__ == "__main__":
     print("--------------------------------------------------------------------------------------------------------------------------------------------")
     xml = "./read_CFDI/SEPTIEMBRE_CFDI/0DB6C48D-7EAD-49E5-9553-FD9AFFF3C97C.xml"
     Nomina = "./read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
+    Problemas_complemento = "read_CFDI/2021/Enero/Recibidas/1ab75101-13d5-4a88-ab93-3e123df5b38b.xml"
     
-    
-    DATA = Reed_xml(Nomina, RFC=RFC)
+    DATA = Reed_xml(Problemas_complemento)
     data = DATA.main()
     print(data)
     # dir_path = './CFDI/testing_CFDI'
