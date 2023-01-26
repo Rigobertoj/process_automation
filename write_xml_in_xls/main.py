@@ -16,15 +16,10 @@ def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data 
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
-    xml_directorio = "./read_CFDI/2021/Enero/Emitidas"
-    xls_directorio = './xls/Enero_2022.xlsx'
-    name_sheet = "Conjunto de gastos"
+    xml_directorio = "./read_CFDI/2021/Enero/Recibidas"
+    xls_directorio = './xls/Enero_egresos.xlsx'
+    name_sheet = "Conjunto de gastos" 
     intial_cell = "A1"
     
     DATA_CFDI = get_xml_data(xml_directorio, RFC)
-    # for element in DATA_CFDI:
-    #     print("_____________________________________________________________")
-    #     for key, value in element.items():
-    #         print(f"""
-    #               {key} {value}""")
     insert_data(xls_directorio, name_sheet,intial_cell, DATA_CFDI)

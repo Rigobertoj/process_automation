@@ -7,6 +7,7 @@ from datetime import datetime
 
 
 class CFDI (Reed_xml):
+    __URL_CFDI__ = "{http://www.sat.gob.mx/cfd/3}"
     def __init__(self, path_document : str, RFC : str, nombre : Optional[str] = "" ) -> None:
         super().__init__(path_document)
         self.__RFC__ = RFC
@@ -15,7 +16,7 @@ class CFDI (Reed_xml):
         print(self.root_attrs.get("Folio"))
         
     def test(self):
-        print(self.get_folio_relaciones())
+        print(self.get_retenciones())
         
         
     def main(self):
@@ -191,38 +192,45 @@ class CFDI (Reed_xml):
         return self.root_attrs["Total"]
     
     
-    def get_traslados(self) -> int:
-        root = self.get_items(self.get_childs(self.root))
+    def get_retenciones(self) -> int:
         try :
-            Impuestos = self.get_childs(root["Impuestos"])
-            traslados = Impuestos.get("Traslados")
+            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Retenciones")
             
-            if traslados:
-                Importe = self.get_items(self.get_childs(traslados)["Traslado"])
-                return float(Importe["Importe"])
+            if Traslados:        
+                return None
             
+            print("Traslados")            
+        
+        except KeyError or AttributeError:
             return None
         
+    def search_tag(self, name_tag : str, element : ET.Element):
+        try :
+            return lambda URL : next(
+                filter(
+                    lambda e: e.tag == f"{URL}{name_tag}", element.iter()
+                    )
+                )
+        except StopIteration :
+            return None
+        
+    def get_traslado(self) -> dict[str]:
+        try :
+            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
+            Traslado = self.get_childs(Traslados)       
+            
+            if not Impuestos:
+                return None
+        
+            Retencion = list(map(self.get_items, list(Traslado.values())))
+            data_traslados= list({objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion}.values())
+            return reduce( lambda acc, current_value : acc + current_value, data_traslados) 
         except KeyError:
             return None
         
-        
-    def get_retenciones(self) -> dict[str]:
-        root = self.get_items(self.get_childs(self.root))
-        try :
-            Impuestos = self.get_childs(root["Impuestos"])
-            
-            if "Retenciones" in Impuestos :
-                Retenciones = Impuestos["Retenciones"]
-                             
-                childs = self.get_childs(Retenciones)
-                
-                Retencion = list(map(self.get_items, list(childs.values())))
-                
-                return {objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion} 
-            return None
-        
-        except KeyError:
+        except StopIteration :
             return None
     
         
@@ -233,10 +241,10 @@ class CFDI (Reed_xml):
             Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
         """
         
-        retenciones = self.get_retenciones() or {}
-        iva = self.get_traslados() or None
+        traslado = self.get_traslado()
+        ret = self.get_retenciones() or None
 
-        return iva, retenciones.get("002"), retenciones.get("001")
+        return traslado 
         
             
     
@@ -303,10 +311,13 @@ if __name__ == '__main__' :
     fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
     fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
     fact_nomina_2 = "./read_CFDI/Nomina/E211FFAB-D67D-4373-968E-83C02741628F.xml"
+    problemas_iva = "read_CFDI/2021/Enero/Recibidas/26cadc4a-b591-4912-911e-20a57252de24.xml"
     
-    cfdi = CFDI(fact_muchos_conceptos,RFC)
-    data = cfdi.main()
-    for key, value in data.items():
-        print(
-        f"""
-        {key} : {value}""")
+    
+    cfdi = CFDI(problemas_iva,RFC)
+    data = cfdi.get_taxes()
+    print(data)
+    # for key, value in data.items():
+    #     print(
+    #     f"""
+    #     {key} : {value}""")
