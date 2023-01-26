@@ -2,6 +2,8 @@ import openpyxl
 from openpyxl import load_workbook
 from openpyxl import Workbook
 import os
+import copy
+
 
 class write_xlsx():
     """
@@ -33,20 +35,15 @@ class write_xlsx():
 
         """
         try :
-            print("try")
             if name_woorkbook  != "":
-                print("workbook")
-                self.wb = Workbook(name_woorkbook)
-                print(self.wb)
+                self.wb = Workbook(name_woorkbook, write_only=False)
                 self.__path_file = name_woorkbook
             elif path_file != "":
-                print("loading path")
-                print(self.item)
-                self.wb = load_workbook(path_file)
-                print("WB ")
+                self.wb = load_workbook(path_file, read_only=False)
                 self.__path_file = path_file
         except: ValueError("Introduce una ruta o nombre de archivo valido")
 
+        self.wb.save(self.__path_file)
 
 
 
@@ -95,9 +92,9 @@ class write_xlsx():
                 print("else")
                 return 26 * letra_a_numero(letra[:-1]) + letra_a_numero(letra[-1])
             
-        def asigacion_de_data(value, cell):
-            cell.value = value
-            return cell 
+        def asigacion_de_data(data,cell):
+            cell.value = data
+            return cell
            
         #obtenemos la columna desde que se empezada
         colunn = initial_cell[0]
@@ -111,49 +108,61 @@ class write_xlsx():
         #obtenemos el maximo de celdad que se van a escribir
         max_col = num_column + len(data) -1
         
+        #si el valor del argumento nombre existe dentro del workbook 
         if name_sheet in self.wb.sheetnames:
+            #asignando el objeto worksheet a una propiedad 
             self.ws = self.wb[name_sheet]
         else:
-            self.ws = self.wb.create_sheet(name_sheet)
+            print("Create")
+            #si no creamos una hoja con el nombre del argumento 
+            self.wb.create_sheet(name_sheet)
+            self.ws = self.wb[name_sheet]
+            print(self.ws)
 
         # celda inicial y celda final del rango a escribir
         def rows_iter(row, num_column, max_col):
             fila_a_editar = self.ws.iter_rows(
             min_row=row, max_row=row, min_col=num_column, max_col=max_col
             )
-            fila_vasia = self.validate_content(fila_a_editar)
-            print(fila_vasia)
-            if not fila_vasia:
-                print("No Vasia")
-                return rows_iter(row + 1, num_column, max_col)
+            
+            # retornamos la validacion de la fila vacia
+            fila_validada = self.Empty_row(fila_a_editar)
+            
+            
+            if fila_validada:
+                return fila_validada
             else:
-                print("VASIA")
-                return fila_a_editar
+                return rows_iter(row + 1, num_column, max_col)
             
         fila_a_editar = rows_iter(row, num_column, max_col)
+        fila_a_editar = fila_a_editar[0]
+        
         print(fila_a_editar)
         
         value = list(
             map(asigacion_de_data, 
             data,
-            tuple(
-                map(lambda cell : cell, fila_a_editar))
-            )
-        )
-        print(value)
+            fila_a_editar
+        ))
+        print(f"value {value}")
         self.wb.save(self.__path_file)
         
-    def validate_content (self, iter_rows):
-        print(iter_rows)
-        for row in iter_rows:
+    def Empty_row (self, fila_a_editar):
+        validate = {True}
+
+        copi_row = copy.copy(list(fila_a_editar))
+        print(copi_row)
+        for row in copi_row:
             for cell in row:
-                print(cell)
                 if cell.value != None:
-                    return False
-        return True    
-            
+                    validate.add(False)
+                    
+        if False  not in validate:
+            return copi_row
+        
+        return False            
             
 
 if __name__ == "__main__":
-    enero = write_xlsx(path_file="./xls/Enero_2022.xlsx")
-    enero.write_row_by_range("Clasificacion de gastos", "A1", ["2"])
+    enero = write_xlsx(path_file="Enero_2022.xlsx")
+    enero.write_row_by_range("Clasificacion de gastos", "A2", ["2","3"])
