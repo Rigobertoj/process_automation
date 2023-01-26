@@ -1,5 +1,5 @@
-from process_data import Process_data, reed_xml, multi_reed_xml
-from write_xlsx import write_xlsx
+from process_data import  multi_reed_xml
+from xlsx import write_xlsx
 from reed_multiples_xml import multi_reed_xml
 
 
@@ -15,11 +15,12 @@ def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data 
     value = list(map(lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.values())), data))
     return value
 
+
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
-    xml_directorio = "./read_CFDI/2021/Enero/Recibidas"
-    xls_directorio = './xls/Enero_egresos.xlsx'
-    name_sheet = "Conjunto de gastos" 
+    xml_directorio = "./read_CFDI/2021/Enero/Emitidas"
+    xls_directorio = './xls/Enero_ingresos.xlsx'
+    name_sheet = "Conjunto de gastos 2" 
     intial_cell = "A1"
     
     DATA_CFDI = get_xml_data(xml_directorio, RFC)

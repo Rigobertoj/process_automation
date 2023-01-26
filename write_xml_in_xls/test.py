@@ -1,14 +1,14 @@
-import xml.etree.cElementTree as ET
+import shutil
+import os
 
-# Carga el archivo XML en un árbol de elementos
-fact_pago_emitida = "read_CFDI/2021/Enero/Emitidas/2f99dd73-df61-4481-bc02-34010db1fd3a.xml"
+# Ruta del archivo a mover
+file_path = './main.txt'
 
-tree = ET.ElementTree(file=fact_pago_emitida)
-root = tree.getroot()
+# Ruta de la carpeta destino
+destination_path = './xls'
 
-# Busca el elemento "pago10:DoctoRelacionado" en el árbol
-docto_relacionado = root.find(root.tag)
+# Mover el archivo
+# shutil.move(file_path, destination_path)
 
-# Imprime el elemento encontrado
-print(docto_relacionado)
-print(root.attrib)
+
+os.rmdir("")

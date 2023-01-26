@@ -1,6 +1,5 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
-from typeguard import typechecked
 from functools import reduce
 from subprocess import run, PIPE
 import os
@@ -23,7 +22,6 @@ class write_xlsx():
     sheets = {}
     item = 1
     
-    @typechecked
     def __init__(self, file_name : str) -> None:
 
         """
@@ -105,7 +103,6 @@ class write_xlsx():
         return self.wb.sheetnames
 
 
-    @typechecked
     def set_sheet_name(self, sheet_name: str,) -> str:
         """
         description: establece la hoja del documento que se procesara o manipulara
