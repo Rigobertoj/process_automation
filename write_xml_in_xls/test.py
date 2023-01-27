@@ -11,4 +11,11 @@ destination_path = './xls'
 # shutil.move(file_path, destination_path)
 
 
-os.rmdir("")
+data = {"22", "23"}
+
+a = "lasñdkf_22_asdkfj"
+
+results = data in a
+print(results)
+
+# os.rmdir("")
