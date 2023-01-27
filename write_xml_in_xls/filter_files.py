@@ -1,6 +1,6 @@
 import shutil
 import os
-
+import re
 
 class Files():
     """
@@ -24,15 +24,11 @@ class Files():
     def searh_files_by_directory(self, set_validation: set | list | tuple):
         set_validation = set(set_validation) if set_validation is not set else None
 
-        documents = os.listdir(self.__dir_path__)
+        set_validation_2 = re.compile("|".join(set_validation))
+        files  = os.scandir(self.__dir_path__)
 
-        data = []
-        for validacion in set_validation:
-            for document in documents:
-                if validacion in document:
-                    data.append(f"{self.__dir_path__}{document}")
+        return (file.path for file in files if set_validation_2.search(file.name))
 
-        return data
 
 
     def filter_files(self, condicion: str):
@@ -69,7 +65,6 @@ class Files():
 
 
     def move_list_file(self, new_dir, list_path_file):
-        print(self.__dir_path__)
         if not os.path.exists(f"{self.__dir_path__}{new_dir}"):
             os.mkdir(f"{self.__dir_path__}{new_dir}")
 
@@ -176,7 +171,7 @@ if __name__ == "__main__":
 "2317",
 "2318",
     }
-    
+
     Arrendamientos = {"2244",
 "2291",
 "2292",
@@ -200,7 +195,6 @@ if __name__ == "__main__":
     # Noviembre_CFDI.move_list_file("Intereses", data)
     Noviembre_CFDI.move_list_file("Honorarios", Honorarios_data)
     Noviembre_CFDI.move_list_file("Arrendamientos", Arrendamientos_data)
-
 
 
     
