@@ -13,3 +13,5 @@
 *.xml
 
 .pdf
+
+*read_CFDI/
