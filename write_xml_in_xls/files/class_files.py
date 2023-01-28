@@ -69,8 +69,16 @@ class Files():
     def copy_file(self, new_dir: str, file: str):
         new_dir_file = f"{new_dir}/{self.get_name_file(file)}"
 
-        with open(file, "r")as origen, open(new_dir_file, "w") as destino:
-            destino.write(origen.read())
+        try: 
+            with open(file, "r") as origen, open(new_dir_file, "w") as destino:
+                destino.write(origen.read())
+
+        except UnicodeDecodeError:
+            print(f"{self.__dir_path__}{file}")
+            with open(file, "r", encoding="UTF-8") as origen, open(new_dir_file, "w", encoding="UTF-8") as destino:
+                destino.write(origen.read())
+
+
 
     def move_list_file(self, new_dir, list_path_file):
         if not os.path.exists(f"{self.__dir_path__}{new_dir}"):

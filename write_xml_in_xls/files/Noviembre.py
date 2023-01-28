@@ -122,13 +122,13 @@ Arrendamientos_data = Noviembre_CFDI.searh_files_by_directory(Nov_Arrendamientos
 
 No_identificados = Noviembre_CFDI.filter_files_not_found(Nov_Arrendamientos|Nov_intereses|Nov_Honorarios)
 
-
-
 # Noviembre_CFDI.move_list_file("Intereses", Intereses)
 # Noviembre_CFDI.move_list_file("Honorarios", Honorarios_data)
 # Noviembre_CFDI.move_list_file("Arrendamientos", Arrendamientos_data)
 
-# sum_xml = len(generador_to_list(os.scandir(f"{path}XML")))
-# sum_tipo_ingresos = len(generador_to_list(Intereses)) + len(
-#     generador_to_list(Honorarios_data)) + len(generador_to_list(Arrendamientos_data))
-# print(sum_tipo_ingresos)
+# Noviembre_CFDI.move_list_file("No identificados", No_identificados)
+
+sum_xml = len(generador_to_list(os.scandir(f"{path}XML")))
+sum_tipo_ingresos = len(generador_to_list(Intereses)) + len(
+    generador_to_list(Honorarios_data)) + len(generador_to_list(Arrendamientos_data))
+print(sum_tipo_ingresos)
