@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<Carga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/Carga.xsd">
+
+        <Encabezado>
+        
+             <ClaveOtorgante>0000080008</ClaveOtorgante>
+             <NombreOtorgante></NombreOtorgante>
+             <FechaCorte>20210630</FechaCorte>
+             <Version>5</Version>
+
+        </Encabezado>
+        
+
+    <Personas>
+        
+    <Persona>
+        
+        <Nombre>
+        
+             <RFC>RARC860607497</RFC>
+             <Nombres>CARLOS MANUEL</Nombres>
+             <ApellidoPaterno>RAMIREZ</ApellidoPaterno>
+             <ApellidoMaterno>ROSALES</ApellidoMaterno>
+             <FechaNacimiento>20141127</FechaNacimiento>
+
+        </Nombre>
+        
+    <Domicilios>
+        
+        <Domicilio>
+        
+             <Direccion>SANTA TERESA DE JESUS 266</Direccion>
+             <ColoniaPoblacional>CAMINO REAL</ColoniaPoblacional>
+             <DelegacionMunicipio>ZAPOPAN</DelegacionMunicipio>
+             <Ciudad>ZAPOPAN</Ciudad>
+             <Estado>JALISCO</Estado>
+             <CP>45040</CP>
+
+        </Domicilio>
+        
+    </Domicilios>
+        
+        
+    <Empleos>
+        
+        <Empleo>
+        
+             <NombreEmpresa>CARLOS MANUEL RAMIREZ ROSALES</NombreEmpresa>
+             <Direccion E>SANTA TERESA DE JESUS 266</Direccion E>
+             <ColoniaPoblacion E>CAMINO REAL</ColoniaPoblacion E>
+             <DelegacionMunicipal E>ZAPOPAN</DelegacionMunicipal E>
+             <Ciudad E>ZAPOPAN</Ciudad E>
+             <Estado E>JALISCO</Estado E>
+             <CP E>45040</CP E>
+
+        </Empleo>
+        
+    </Empleos>
+    
+        
+        <Cuenta>
+        
+             <ClaveActualOtorgante>None</ClaveActualOtorgante>
+             <NombreOtorgante>None</NombreOtorgante>
+             <CuentaActual>None</CuentaActual>
+             <TipoResponsabilidad>I</TipoResponsabilidad>
+             <TipoCuenta>P</TipoCuenta>
+             <TipoContrato>AR</TipoContrato>
+             <ClaveUnidadMonetaria>MX</ClaveUnidadMonetaria>
+             <FrecuenciaPagos>M</FrecuenciaPagos>
+             <MontoPagar>80000</MontoPagar>
+             <FechaAperturaCuenta>20211206</FechaAperturaCuenta>
+             <FechaUltimoPago>20220825</FechaUltimoPago>
+             <FechaUltimaCompra>20211206</FechaUltimaCompra>
+             <FechaCorte>20230113</FechaCorte>
+             <CreditoMaximo>2000000</CreditoMaximo>
+             <SaldoActual>2000000</SaldoActual>
+             <Limite credito>None</Limite credito>
+             <SaldoVencido>583878.5893709798</SaldoVencido>
+             <PagoActual>7</PagoActual>
+             <FechaPrimerIncumplimiento>20220306</FechaPrimerIncumplimiento>
+             <SaldoInsoluto>2000000</SaldoInsoluto>
+             <MontoUltimoPago>28501.87</MontoUltimoPago>
+             <PlazoMeses>24</PlazoMeses>
+             <MontoCreditoOriginacion>2000000</MontoCreditoOriginacion>
+
+        </Cuenta>
+        
+    </Persona>
+            
+    </Personas>
+    
+</Carga>  

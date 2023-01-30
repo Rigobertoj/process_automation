@@ -1,6 +1,5 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
-from typeguard import typechecked
 from functools import reduce
 from subprocess import run, PIPE
 import os
@@ -23,7 +22,6 @@ class write_xlsx():
     sheets = {}
     item = 1
     
-    @typechecked
     def __init__(self, file_name : str) -> None:
 
         """
@@ -75,6 +73,7 @@ class write_xlsx():
         else:
             return False
 
+        self.wb.save(self.__path_file)
 
     def _load_file(self, file_name  :str):
         """Description : Carga el documento excel a travez de la ruta introducida
@@ -104,7 +103,6 @@ class write_xlsx():
         return self.wb.sheetnames
 
 
-    @typechecked
     def set_sheet_name(self, sheet_name: str,) -> str:
         """
         description: establece la hoja del documento que se procesara o manipulara
@@ -164,6 +162,7 @@ class write_xlsx():
             #asignando el objeto worksheet a una propiedad 
             self.ws = self.wb[name_sheet]
         else:
+            print("Create")
             #si no creamos una hoja con el nombre del argumento 
             # self.wb.create_sheet(name_sheet)
             # self.ws = self.wb.active

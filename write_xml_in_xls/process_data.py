@@ -1,5 +1,5 @@
 from reed_multiples_xml import multi_reed_xml
-from reed_xml import reed_xml, RFC
+from reed_xml import RFC
 import datetime
 
 """

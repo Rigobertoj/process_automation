@@ -1,5 +1,5 @@
 from reed_xml import reed_xml 
-from itertools import 
+# from itertools import 
 """
 En este script lo que queremos es obtener una serie de valores 
 - fecha de factura : 

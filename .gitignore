@@ -8,8 +8,10 @@
 
 *Egresos/
 
-*.xlsx
-
 *.xml
 
-read_CFDI/
+.pdf
+
+*read_CFDI/
+
+*11NOVIEMBRE/
