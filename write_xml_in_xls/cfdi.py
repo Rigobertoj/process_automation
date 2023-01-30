@@ -204,7 +204,7 @@ class CFDI (Reed_xml):
             if not Retenciones:
                 return None
             
-            elements = self.get_childs(Traslados)
+            elements = self.get_childs(Retenciones)
             data_elements = list(map(self.get_items, list(elements.values())))
             return {obj["Impuesto"] : obj["Importe"] for obj in data_elements}
             
