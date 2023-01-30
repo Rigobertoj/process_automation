@@ -11,7 +11,7 @@ def foreach(func : callable, list : list):
     for i in range(len(list)):
         func(list[i])
     
-class Reed_xml:
+class Reed_xml():
     def __init__(self, path_document : str) -> None:
         if not self.validate_path(path_document): 
             raise ValueError("La ruta especificada no es válida.")
@@ -167,7 +167,6 @@ if __name__ == "__main__":
     
     DATA = Reed_xml(Problemas_complemento)
     data = DATA.main()
-    print(data)
     # dir_path = './CFDI/testing_CFDI'
     # xml = reed_multiples_xml(dir_path, RFC=RFC)
 

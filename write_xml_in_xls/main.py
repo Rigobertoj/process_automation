@@ -1,5 +1,5 @@
 from process_data import  multi_reed_xml
-from xlsx import write_xlsx
+from xls import xlsx
 from reed_multiples_xml import multi_reed_xml
 
 
@@ -9,7 +9,7 @@ def get_xml_data(directorio,RFC):
 
 
 def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data : list):
-    wb = write_xlsx(Document_path)
+    wb = xlsx.write_xlsx(Document_path)
     keys = lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.keys()))
     data_kesy = keys(data[0])
     value = list(map(lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.values())), data))

@@ -36,7 +36,7 @@ class write_xlsx():
 
         """
                     
-        if self._is_valid_path(file_name):
+        if self._is_valid_path(file_name):            
             
             def create_document():
                 self._create_file(file_name)
@@ -185,9 +185,7 @@ class write_xlsx():
             return fila_validada if fila_validada else rows_iter(row + 1, initial_column, max_col)
 
         fila_a_editar = rows_iter(row, initial_column, max_col)
-        print(fila_a_editar)    
         fila_a_editar = fila_a_editar[0]
-        print(fila_a_editar)    
                 
         value = list(
             map(asigacion_de_data, 
