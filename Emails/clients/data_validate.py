@@ -1,5 +1,5 @@
 from hashlib import new
-
+  
 from numpy import half
 # from reedclients import reedClient
 from datetime import date, datetime  as dt
