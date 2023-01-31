@@ -36,7 +36,7 @@ class write_xlsx():
 
         """
                     
-        if self._is_valid_path(file_name):
+        if self._is_valid_path(file_name):            
             
             def create_document():
                 self._create_file(file_name)
@@ -162,7 +162,6 @@ class write_xlsx():
             #asignando el objeto worksheet a una propiedad 
             self.ws = self.wb[name_sheet]
         else:
-            print("Create")
             #si no creamos una hoja con el nombre del argumento 
             # self.wb.create_sheet(name_sheet)
             # self.ws = self.wb.active
@@ -185,9 +184,7 @@ class write_xlsx():
             return fila_validada if fila_validada else rows_iter(row + 1, initial_column, max_col)
 
         fila_a_editar = rows_iter(row, initial_column, max_col)
-        print(fila_a_editar)    
         fila_a_editar = fila_a_editar[0]
-        print(fila_a_editar)    
                 
         value = list(
             map(asigacion_de_data, 

@@ -1,5 +1,5 @@
 from process_data import  multi_reed_xml
-from xlsx import write_xlsx
+from xls import xlsx
 from reed_multiples_xml import multi_reed_xml
 
 
@@ -9,19 +9,23 @@ def get_xml_data(directorio,RFC):
 
 
 def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data : list):
-    wb = write_xlsx(Document_path)
+    wb = xlsx.write_xlsx(Document_path)
     keys = lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.keys()))
     data_kesy = keys(data[0])
     value = list(map(lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.values())), data))
     return value
 
 
-if __name__ == '__main__':
+def main():
     RFC = "PPR0610168Z1"
     xml_directorio = "./read_CFDI/2021/Enero/Emitidas"
-    xls_directorio = './xls/Enero_ingresos.xlsx'
+    xls_directorio = './xls/Enero_ingresos_2.xlsx'
     name_sheet = "Conjunto de gastos 2" 
     intial_cell = "A1"
     
     DATA_CFDI = get_xml_data(xml_directorio, RFC)
     insert_data(xls_directorio, name_sheet,intial_cell, DATA_CFDI)
+
+if __name__ == '__main__':
+    # main()
+    pass    
