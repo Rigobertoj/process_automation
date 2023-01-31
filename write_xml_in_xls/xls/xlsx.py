@@ -162,7 +162,6 @@ class write_xlsx():
             #asignando el objeto worksheet a una propiedad 
             self.ws = self.wb[name_sheet]
         else:
-            print("Create")
             #si no creamos una hoja con el nombre del argumento 
             # self.wb.create_sheet(name_sheet)
             # self.ws = self.wb.active

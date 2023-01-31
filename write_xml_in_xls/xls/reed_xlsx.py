@@ -1,13 +1,19 @@
-import openpyxl 
+from openpyxl import load_workbook
+import pandas as pd
 import os
 
-class Read_xlsx(openpyxl):
+class Read_xlsx():
     
-    def __init__(self, file_path : str):
-        
-        if self._is_valid_path(file_path):     
-            self.file_path = file_path   
-            self.wb = openpyxl.load_workbook(file_path) 
+    def __init__(self, file_path : str, worksheet_name : str):
+        if self._is_valid_path(file_path):
+            try : 
+                self.file_path = file_path   
+                self.wb = load_workbook(file_path)
+            
+                self.set_work_sheet(worksheet_name)
+                self.df = self.__get_data_frame__(file_path)
+            except KeyError :
+                raise KeyError(f"la worksheet : {worksheet_name},  no existe")
         else:
             raise ValueError("Introduce una ruta o nombre de archivo valido")
     
@@ -15,13 +21,14 @@ class Read_xlsx(openpyxl):
     def  __str__(self) -> str:
         return f"""
     wb path : {self.file_path}
-    wb set : {self.ws}
+    ws set  : {self.ws}
         """
                 
     
     def set_work_sheet(self, sheet_name : str):
         try :
-            self.ws = self.wb[sheet_name]
+            if sheet_name in self.wb.sheetnames:
+                self.ws = self.wb[sheet_name]
         except ValueError:
             pass
     
@@ -42,8 +49,23 @@ class Read_xlsx(openpyxl):
         else:
             return False
         
+    
+    def __get_data_frame__(self, path):
+        return pd.read_excel(path)
+    
+    
+    def filter_Tipe(self, type : str):
+        return self.df[self.df["Tipo."] == f"{type}"]
         
-if __name__ == '__main__':
+        
+        
+
+def main():
     wb_path = "Enero_ingresos.xlsx"
-    wb_obj = Read_xlsx(wb_path)
-    print(wb_obj)
+    ws_name = "Conjunto de gastos 2"
+    wb_obj = Read_xlsx(wb_path, ws_name)
+    data = wb_obj.filter_data()
+    print(data)
+
+if __name__ == '__main__':
+    main()

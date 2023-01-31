@@ -16,12 +16,16 @@ def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data 
     return value
 
 
-if __name__ == '__main__':
+def main():
     RFC = "PPR0610168Z1"
     xml_directorio = "./read_CFDI/2021/Enero/Emitidas"
-    xls_directorio = './xls/Enero_ingresos.xlsx'
+    xls_directorio = './xls/Enero_ingresos_2.xlsx'
     name_sheet = "Conjunto de gastos 2" 
     intial_cell = "A1"
     
     DATA_CFDI = get_xml_data(xml_directorio, RFC)
     insert_data(xls_directorio, name_sheet,intial_cell, DATA_CFDI)
+
+if __name__ == '__main__':
+    # main()
+    pass    
