@@ -1,5 +1,5 @@
 from reed_xml import Reed_xml, foreach
-from utils import main
+from utils import utils
 from functools import reduce
 from typing import Optional, Union
 import xml.etree.cElementTree as ET
@@ -17,8 +17,8 @@ class CFDI (Reed_xml):
         print(self.root_attrs.get("Folio"))
         
     def test(self):
-        pass
-        # print(self.get_taxes())
+        data = self.get_clave_prod_serv()
+        print(data)
         
         
     def main(self):
@@ -50,7 +50,7 @@ class CFDI (Reed_xml):
             "Fecha de facturación." : fecha_De_facturacion, 
             "Tipo.": None,
             "Clase." : None,
-            "Clave de producto o servicio." : self.conceptos["Clave de producto o servicio."],
+            "Clave de producto o servicio." : self.get_clave_prod_serv(),
             "num" : folio_de_la_factura,
             "Folio fiscal." : folio_fiscal,
             "Nombre." : Name,
@@ -97,18 +97,33 @@ class CFDI (Reed_xml):
         return (Emisor, 
                 Receptor)
     
+
+    def get_clave_prod_serv(self,):
+        """
+        descripcion : Metodo que me permite obtener la clave de producto o servicio en base a el producto o servicio que tenga mayor proporcion en la factura
+
+        return (str) : clave de producto o servicio
+        """
+        data = utils.reduce_list_dict(
+                self.Data_conceptos()
+                )
+        dict_data = utils.reduce_two_list_dict(data, "Clave de producto o servicio.","Importe" )
+        dict_sort = utils.sort_dict_by_value(dict_data)
+        key = list(dict_sort.keys())[-1]
+        return utils.split_space(key)[0]
+            
+    
         
     def get_concepto(self, element : ET.Element):
         return self.get_items(element)
     
     
     def get_conceptos(self) -> dict: 
-        data = main.reduce_dict(
-            main.reduce_list_dict(
+        data = utils.reduce_dict(
+            utils.reduce_list_dict(
                 self.Data_conceptos()
                 )
             )
-        print(data)
         return data
     
     def Data_conceptos(self):        
@@ -118,13 +133,10 @@ class CFDI (Reed_xml):
         Data_conceptos = list(map(self.get_concepto, list(conceptos)))
             
         data =  list(map(self.compuse_data_conceptos, Data_conceptos))
-        for item in data:
-            print(item)
         return data
         
     def compuse_data_conceptos (self, data_element : dict):
-        ClaveProdServ = self.get_clave_prod_serv(data_element)
-        print(f"clave productos {type(ClaveProdServ)}")
+        ClaveProdServ = self.set_clave_prod_serv(data_element)
         Descripcion = self.get_invoice_concept(data_element)
         Importe = self.get_Importe(data_element)
         Descuento = self.get_concep_descuento(data_element)
@@ -139,7 +151,7 @@ class CFDI (Reed_xml):
         }
         
 
-    def get_clave_prod_serv(self, data_element : dict):
+    def set_clave_prod_serv(self, data_element : dict):
         if data_element["ClaveProdServ"]:
             return data_element["ClaveProdServ"]
         return None
@@ -320,6 +332,7 @@ if __name__ == '__main__' :
     
     cfdi = CFDI(dos_conceptos,RFC)
     data = cfdi.main()
+    print(data)
     for key, value in data.items():
         print(
         f"""
