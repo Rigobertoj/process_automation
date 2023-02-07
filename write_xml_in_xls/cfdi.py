@@ -1,4 +1,5 @@
 from reed_xml import Reed_xml, foreach
+from utils import main
 from functools import reduce
 from typing import Optional, Union
 import xml.etree.cElementTree as ET
@@ -25,6 +26,7 @@ class CFDI (Reed_xml):
         fecha_De_facturacion = self.fecha_facturacion()
         print(fecha_De_facturacion)
         self.conceptos = self.get_conceptos()
+        print("clv",type(self.conceptos["Clave de producto o servicio."]))
         # print(self.conceptos)
                     
         folio_fiscal = self.get_file_name()
@@ -101,12 +103,13 @@ class CFDI (Reed_xml):
     
     
     def get_conceptos(self) -> dict: 
-        return self.reduce_dict(
-            self.reduce_list_dict(
+        data = main.reduce_dict(
+            main.reduce_list_dict(
                 self.Data_conceptos()
                 )
             )
-    
+        print(data)
+        return data
     
     def Data_conceptos(self):        
         child_root = self.get_childs(self.root)
@@ -114,11 +117,14 @@ class CFDI (Reed_xml):
                 
         Data_conceptos = list(map(self.get_concepto, list(conceptos)))
             
-        return list(map(self.compuse_data_conceptos, Data_conceptos))
-    
+        data =  list(map(self.compuse_data_conceptos, Data_conceptos))
+        for item in data:
+            print(item)
+        return data
         
     def compuse_data_conceptos (self, data_element : dict):
         ClaveProdServ = self.get_clave_prod_serv(data_element)
+        print(f"clave productos {type(ClaveProdServ)}")
         Descripcion = self.get_invoice_concept(data_element)
         Importe = self.get_Importe(data_element)
         Descuento = self.get_concep_descuento(data_element)
@@ -131,28 +137,6 @@ class CFDI (Reed_xml):
             "Sub total" : Descuento,
             "Sub total" : Sub_total,
         }
-        
-    def reduce_list_dict(self, dict_list):
-        # Función para acumular los valores de cada clave
-        def accumulator(acc, item):
-            for key, value in item.items():
-                value = str(value)
-                if key in acc:
-                    acc[key].append(value)
-                else:
-                    acc[key] = [value]
-            return acc
-
-        # Usamos reduce para acumular los valores de cada clave en un solo objeto
-        reduced_dict = reduce(accumulator, dict_list, {})
-
-        return reduced_dict
-
-    def reduce_dict(self, dict) -> dict:
-        c_dict = c.copy(dict)
-        for key, value in c_dict.items():
-            c_dict[key] = "\n-".join(value )
-        return c_dict
         
 
     def get_clave_prod_serv(self, data_element : dict):
@@ -332,8 +316,9 @@ if __name__ == '__main__' :
     Problemas_complemento = "read_CFDI/2021/Enero/Recibidas/1ab75101-13d5-4a88-ab93-3e123df5b38b.xml"
     pago_nomina_enero = "read_CFDI/2021/Enero/Emitidas/ae8fe564-d3ba-4df4-98ed-0475bd33ec40.xml"
     
+    dos_conceptos = "read_CFDI/2022/07JULIO/PPR0610168Z1_1877_REI030507D15.xml"
     
-    cfdi = CFDI(pago_nomina_enero,RFC)
+    cfdi = CFDI(dos_conceptos,RFC)
     data = cfdi.main()
     for key, value in data.items():
         print(

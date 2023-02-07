@@ -170,4 +170,4 @@ if __name__ == "__main__":
     # dir_path = './CFDI/testing_CFDI'
     # xml = reed_multiples_xml(dir_path, RFC=RFC)
 
-    # print(xml)
+    print(data)
