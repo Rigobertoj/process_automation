@@ -2,6 +2,8 @@ from openpyxl import load_workbook
 import pandas as pd
 import os
 import sys
+from functools import reduce
+
 sys.path.append("../")
 from utils import maybe
 
@@ -80,26 +82,32 @@ class Process_xlsx(Read_xlsx):
     def __init__(self,path, ws_name):
         super().__init__(path,ws_name)
 
-    def get_tipo_operacion(self):
-        column_types = "Clave de producto o servicio."
-        types = self.get_column(column_types)
-        df = self.filter_Tipe(column_types)
-        # print(df("80101500"))
-        print(types)
+    def get_tipos_operaciones(self):
+        self.clv_prod_serv= "Clave de producto o servicio."
+        tipo = "Tipo."
+        return set(self.get_column(self.clv_prod_serv))
+    
 
-        
+    def get_clasificacion_de_operacion(self):
+        operaciones = self.get_tipos_operaciones()
+        column = self.filter_Tipe(self.clv_prod_serv)
+        df = reduce(
+            lambda acc_df, current_df : pd.concat([acc_df, current_df], axis=0), list(map(column, operaciones))
+            )
+        print(df)
+        self.sort_df = df
+        df.to_excel(self.file_path,  sheet_name='Clasificacion de gastos', index=False)
+
+    
+
 
 def main():
-    # column = "Clave de producto o servicio."
-
-    wb_path = "Enero_ingresos.xlsx"
+    wb_path_e = "Enero_egresos 1.xlsx"
+    wb_path_i = "Enero_ingresos_2.xlsx"
     ws_name = "Conjunto de gastos 2."
-    # wb_obj = Read_xlsx(wb_path, ws_name)
-    # data = wb_obj.filter_Tipe(column)("80101500")
-    # print(data.get("Subtotal.").sum())
-    # print("-------------------")
-    wb = Process_xlsx(wb_path,ws_name)
-    wb.get_tipo_operacion()
+    wb = Process_xlsx(wb_path_e, ws_name)
+    wb.get_clasificacion_de_operacion()
+
 
 
 if __name__ == '__main__':
