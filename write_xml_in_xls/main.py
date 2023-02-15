@@ -4,28 +4,31 @@ from reed_multiples_xml import multi_reed_xml
 
 
 def get_xml_data(directorio,RFC):
-    response_data_xml = multi_reed_xml(dir_path=directorio, RFC=RFC)
-    return response_data_xml.get_data()
+    return multi_reed_xml(dir_path=directorio, RFC=RFC).get_data()
 
 
-def insert_data(Document_path : str, name_sheet : str, initial_cell : int, data : list):
-    wb = xlsx.write_xlsx(Document_path)
+def insert_data(Document_path : str, file_name : str, name_sheet : str, initial_cell : int, data : list):
+    wb = xlsx.write_xlsx(Document_path, file_name)
     keys = lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.keys()))
-    data_kesy = keys(data[0])
+    keys(data[0])
     value = list(map(lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.values())), data))
     return value
 
 
 def main():
     RFC = "PPR0610168Z1"
-    xml_directorio = "./read_CFDI/2021/Enero/Recibidas"
-    xls_directorio = './xls/Enero_egresos 1.xlsx'
+    path_data = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero"
+    xml_directorio_Egreos = f"C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Egresos"
+    xml_directorio_Ingresos = f"{path_data}/Ingresos" 
+    xls_directorio = f"{path_data}/Excel" 
     name_sheet = "Conjunto de gastos" 
     intial_cell = "A1"
     
-    DATA_CFDI = get_xml_data(xml_directorio, RFC)
-    insert_data(xls_directorio, name_sheet,intial_cell, DATA_CFDI)
+    DATA_CFDI_Ingresos = get_xml_data(xml_directorio_Ingresos, RFC)
+    # DATA_CFDI_Egresos = get_xml_data(xml_directorio_Egreos, RFC)
+    insert_data(xls_directorio,"Ingresos.xlsx", name_sheet,intial_cell, DATA_CFDI_Ingresos, )
+    # insert_data(xls_directorio, "Egresos.xlsx", name_sheet,intial_cell,DATA_CFDI_Egresos)
 
 if __name__ == '__main__':
-    # main()
+    main()
     pass

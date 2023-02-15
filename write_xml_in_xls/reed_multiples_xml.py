@@ -45,7 +45,6 @@ class multi_reed_xml():
             xml = CFDI(file, self.RFC)
             
             data = xml.main()         
-            print(f"Folio fiscal {data}")
             self.__data__.append(data)
 
         return self.__data__

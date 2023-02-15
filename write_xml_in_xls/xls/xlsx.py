@@ -1,5 +1,6 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
+import openpyxl
 from functools import reduce
 from subprocess import run, PIPE
 import os
@@ -22,12 +23,10 @@ class write_xlsx():
     sheets = {}
     item = 1
     
-    def __init__(self, file_name : str) -> None:
+    def __init__(self, path_file : str, file_name : str ) -> None:
 
         """
         description: crea un nuevo documento con el cual se va a trabajar o establece el document que se manipulara.
-
-        si deseas cargar un archivo ya existente pasarias el argumento de file_path o si desear crear uno nuevo el argumento de name_woorkbook
 
         param:
             - name_woorkbook (str) : Nombre del documento que se va a crear o trabajar
@@ -35,29 +34,39 @@ class write_xlsx():
 
 
         """
-                    
-        if self._is_valid_path(file_name):            
-            
-            def create_document():
-                self._create_file(file_name)
-                self.wb.save(file_name)
-                
-            # self._load_file(file_name) if os.path.exists(file_name) else create_document()
-            if os.path.exists(file_name):
-                self._load_file(file_name)
-            else:
-                create_document()
-                self._load_file(file_name)
-                
-                
-            self.__path_file = file_name
-            return
-            
-        else:
-            raise ValueError("Introduce una ruta o nombre de archivo valido")
-                
+        self.validate_xlsx_file(path_file,file_name)
+        print(self.wb.sheetnames)
+        self.__path_file__ = path_file + file_name
     
-    def _is_valid_path(self, path : str):
+
+    def validate_xlsx_file(self, file_path, file_name):
+        full_path = f"{file_path}/{file_name}"
+        if not self._is_valid_path_(file_path):
+            raise FileExistsError("Ingresa una ruta que sea valida")
+        
+        if not file_name.endswith('.xlsx') and not file_path.endswith('.xlsm'):
+            return False
+        
+        if not self._exist_path_(full_path):
+            self._create_document_(full_path)
+
+        try:
+            self._load_file_(full_path)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+
+    def _create_document_(self, file_name):
+        self._create_file_(file_name)
+        self.wb.save(file_name)
+
+    def _exist_path_(self, path : str):
+        return os.path.exists(path)
+
+
+    def _is_valid_path_(self, path : str):
         """Descripcion : metodo que nos permite validar si un string es una ruta de una archivo
 
         Params:
@@ -73,9 +82,8 @@ class write_xlsx():
         else:
             return False
 
-        self.wb.save(self.__path_file)
 
-    def _load_file(self, file_name  :str):
+    def _load_file_(self, file_name  :str):
         """Description : Carga el documento excel a travez de la ruta introducida
 
         Args:
@@ -84,7 +92,7 @@ class write_xlsx():
         self.wb = load_workbook(file_name)
             
             
-    def _create_file(self, file_name :str):
+    def _create_file_(self, file_name :str):
         """Descripción : Crea un documento excel a través de la ruta introducida 
         
         Args:
@@ -163,9 +171,6 @@ class write_xlsx():
             self.ws = self.wb[name_sheet]
         else:
             #si no creamos una hoja con el nombre del argumento 
-            # self.wb.create_sheet(name_sheet)
-            # self.ws = self.wb.active
-            # print(self.ws.name)
             self.ws = self.wb.active
             self.ws.title = name_sheet
                         
@@ -191,7 +196,7 @@ class write_xlsx():
             data,
             fila_a_editar
         ))
-        self.wb.save(self.__path_file)
+        self.wb.save(self.__path_file__)
         
     
     def Empty_row (self, fila_a_editar):        
@@ -202,8 +207,8 @@ class write_xlsx():
     
     def delete_wb(self):
         #TODO : Encontrar el porque falla esta madre 
-        print(self.__path_file)
-        run(["rm", "-r", f"{self.__path_file}"])
+        print(self.__path_file__)
+        run(["rm", "-r", f"{self.__path_file__}"])
         
 
 if __name__ == "__main__":

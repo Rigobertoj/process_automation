@@ -8,25 +8,25 @@ from datetime import datetime
 
 
 class CFDI (Reed_xml):
-    __URL_CFDI__ = "{http://www.sat.gob.mx/cfd/3}"
     def __init__(self, path_document : str, RFC : str, nombre : Optional[str] = "" ) -> None:
         super().__init__(path_document)
         self.__RFC__ = RFC
         self.__Nombre__ = nombre
         self.root_attrs = self.get_items(self.root)
-        print(self.root_attrs.get("Folio"))
         
     def test(self):
         data = self.get_clave_prod_serv()
-        print(data)
-        
+    
+    def __get__url_CFDI__(self):
+        url =  self.root.tag.split("}")[0]
+        self.__URL_CFDI__ = url + "}"
         
     def main(self):
-        
+        self.__get__url_CFDI__()
         fecha_De_facturacion = self.fecha_facturacion()
-        print(fecha_De_facturacion)
+        # print(fecha_De_facturacion)
         self.conceptos = self.get_conceptos()
-        print("clv",type(self.conceptos["Clave de producto o servicio."]))
+        # print("clv",type(self.conceptos["Clave de producto o servicio."]))
         # print(self.conceptos)
                     
         folio_fiscal = self.get_file_name()
@@ -62,7 +62,7 @@ class CFDI (Reed_xml):
             "Ret. IVA." : Ret_IVA ,
             "Ret. ISR." : Ret_ISR,
             "Total." : total, 
-            "Bancos.": None,
+            "Bancos.": "=J6-K6+L6+M6-N6-O6=P6",
             "Folio relacionado" : Folio_fiscal_relacionado,
         }
     
@@ -193,7 +193,6 @@ class CFDI (Reed_xml):
     def get_retenciones(self) -> int:
         try :
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            
             if not Impuestos:        
                 return None
             
@@ -291,14 +290,15 @@ class CFDI (Reed_xml):
             
             data_deducciones = list(
                 map(self.get_items, list(Deducciones.values()))
-                )           
+                )
+            Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
+
+            ISR = Impuestos.pop("002")
+            IMSS = reduce(lambda acc, current : acc + current, list(Impuestos.values()))
         except AttributeError:
             return None
-        
-        Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
-        
-        ISR = Impuestos.pop("002")
-        IMSS = reduce(lambda acc, current : acc + current, list(Impuestos.values()))
+        except TypeError:
+            IMSS = 0          
 
         return ISR, IMSS
         
@@ -330,9 +330,10 @@ if __name__ == '__main__' :
     
     dos_conceptos = "read_CFDI/2022/07JULIO/PPR0610168Z1_1877_REI030507D15.xml"
     
-    cfdi = CFDI(dos_conceptos,RFC)
+    path = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Ingresos/0960a1e0-4a41-4586-a49f-5c03576e337e.xml"
+
+    cfdi = CFDI(path,RFC)
     data = cfdi.main()
-    print(data)
     for key, value in data.items():
         print(
         f"""
