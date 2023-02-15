@@ -304,11 +304,14 @@ class CFDI (Reed_xml):
         
     def get_folio_relaciones(self):
         try :
-            return next(
+            folio = next(
                 filter(
-                    lambda element: element.tag == "{http://www.sat.gob.mx/Pagos}DoctoRelacionado", self.root.iter()
+                    lambda element: element.tag == "{http://www.sat.gob.mx/Pagos}DoctoRelacionado" or element.tag == f"{self.__URL_CFDI__}CfdiRelacionado", self.root.iter()
                     )
-                ).get("IdDocumento")
+                )
+            print(folio)
+            folio_relacionado = folio.get("IdDocumento") or folio.get("UUID")
+            return folio_relacionado
         except StopIteration :
             return None
         
@@ -332,7 +335,9 @@ if __name__ == '__main__' :
     
     path = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Ingresos/0960a1e0-4a41-4586-a49f-5c03576e337e.xml"
 
-    cfdi = CFDI(path,RFC)
+    Sustitución_de_los_CFDI_previos = "C:/Users/User/Documents/Rigo/sofware/process_automation/write_xml_in_xls/read_CFDI/2023/Enero/1E2A6FB9-E71B-4389-8E4E-8786E80020F9.xml"
+
+    cfdi = CFDI(fact_pago_emitida,RFC)
     data = cfdi.main()
     for key, value in data.items():
         print(
