@@ -98,15 +98,20 @@ class Process_xlsx(Read_xlsx):
         self.sort_df = df
         df.to_excel(self.file_path,  sheet_name='Clasificacion de gastos', index=False)
 
-    
 
+    def get_resumen_de_operacion(self):
+        operaciones = self.get_tipos_operaciones()
+        column = self.filter_Tipe(self.clv_prod_serv)
+        df = list(map(column, operaciones))
+        print(df)
 
+        
 def main():
     wb_path_e = "Enero_egresos 1.xlsx"
     wb_path_i = "Enero_ingresos_2.xlsx"
     ws_name = "Conjunto de gastos 2."
     wb = Process_xlsx(wb_path_e, ws_name)
-    wb.get_clasificacion_de_operacion()
+    wb.get_resumen_de_operacion()
 
 
 
