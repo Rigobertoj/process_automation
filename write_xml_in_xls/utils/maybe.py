@@ -7,7 +7,7 @@ class Maybe():
         if self.value is not None :
             return Maybe(func(self.value ))
         else: 
-            Maybe(None)
+            return Maybe(None)
 
 
 def unit_maybe(value):
