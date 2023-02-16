@@ -230,14 +230,12 @@ class CFDI (Reed_xml):
                 return None
             
             Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
-            Traslado = self.get_childs(Traslados)       
-            
+            Traslado = self.get_childs(Traslados) 
 
+    
+            Retencion = map(self.get_items, list(Traslado.values()))         
+            return sum(float(objeto["Importe"]) for objeto in Retencion)
         
-            Retencion = list(map(self.get_items, list(Traslado.values())))
-            data_traslados= list({objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion}.values())
-            print(data_traslados)
-            return reduce( lambda acc, current_value : acc + current_value, data_traslados) 
         
         except KeyError or AttributeError:
             print(F"ERROR: get_traslado -> {self.get_retenciones()}")
