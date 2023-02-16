@@ -275,7 +275,7 @@ class CFDI (Reed_xml):
     def get_data_nominas(self):
         """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le realizan a la nomina en cada una de las operaciones
         
-        Return (Tuple[])
+        Return (Tuple[ ISR : str, IMSS : str])
         
         """
         
@@ -303,18 +303,20 @@ class CFDI (Reed_xml):
         return ISR, IMSS
         
     def get_folio_relaciones(self):
+        """Desccripcion : Metodo que nos permite obtener el folio relacionado de un CFDI para asi saber cual es el estado del mismo
+
+        Return (str | None) : retorna un folio fiscal o NONE dependiento si existe o no
+        """
         try :
             folio = next(
                 filter(
                     lambda element: element.tag == "{http://www.sat.gob.mx/Pagos}DoctoRelacionado" or element.tag == f"{self.__URL_CFDI__}CfdiRelacionado", self.root.iter()
                     )
                 )
-            print(folio)
             folio_relacionado = folio.get("IdDocumento") or folio.get("UUID")
             return folio_relacionado
         except StopIteration :
             return None
-        
         
         
         

@@ -10,7 +10,7 @@ from utils import maybe
 class Read_xlsx():
     
     def __init__(self, file_path : str, worksheet_name : str):
-        if self._is_valid_path(file_path):
+        if self._is_valid_path_(file_path):
             try : 
                 self.file_path = file_path   
                 self.wb = load_workbook(file_path)
@@ -38,7 +38,7 @@ class Read_xlsx():
             pass
     
     
-    def _is_valid_path(self, path : str):
+    def _is_valid_path_(self, path : str):
         """Descripcion : metodo que nos permite validar si un string es una ruta de una archivo
 
         Params:

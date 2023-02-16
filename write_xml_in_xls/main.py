@@ -16,12 +16,10 @@ def insert_data(Document_path : str, file_name : str, name_sheet : str, initial_
 
 
 def main():
-    RFC = "PPR0610168Z1"
     path_data = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero"
     xml_directorio_Egreos = f"C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Egresos"
     xml_directorio_Ingresos = f"{path_data}/Ingresos" 
     xls_directorio = f"{path_data}/Excel" 
-    name_sheet = "Conjunto de gastos" 
     intial_cell = "A1"
     
     DATA_CFDI_Ingresos = get_xml_data(xml_directorio_Ingresos, RFC)
@@ -29,6 +27,44 @@ def main():
     insert_data(xls_directorio,"Ingresos.xlsx", name_sheet,intial_cell, DATA_CFDI_Ingresos, )
     # insert_data(xls_directorio, "Egresos.xlsx", name_sheet,intial_cell,DATA_CFDI_Egresos)
 
+
+def data_2021() -> None:
+    pass
+
+def data_febrero_2023(RFC, name_sheet):
+    path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero"
+    path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"
+    path_xlsx_recibidas = "C:/Users/User/Documents/Rigo/2023/Ingresos/Febrero"
+    path_xlsx_emitidas = "C:/Users/User/Documents/Rigo/2023/Egresos/Febrero"
+
+
+
+    Data_Emitidas = get_xml_data(path_emitidas,RFC)
+    insert_data(
+        path_xlsx_emitidas,
+        "Febrero",
+        name_sheet,
+        "A1", 
+        Data_Emitidas
+        )
+    del Data_Emitidas
+    
+    Data_recibidas = get_xml_data(path_recibidas, RFC)
+    insert_data(        
+        path_xlsx_recibidas,
+        "Febrero",
+        name_sheet,
+        "A1", 
+        Data_recibidas
+        )
+    del Data_recibidas
+    
+
 if __name__ == '__main__':
-    main()
+    RFC = "PPR0610168Z1"
+    name_sheet = "Conjunto de gastos" 
+    
+    # main()
+    # data_2021()
+    data_febrero_2023(RFC, name_sheet)
     pass
