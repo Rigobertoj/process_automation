@@ -1,6 +1,6 @@
 import os
 from reed_xml import RFC
-from cfdi import CFDI
+from cfdi import cfdi
 class multi_reed_xml():
     """
     descripcion : Clase que nos permite extraer la data de multiples xml que esten en un directorio
@@ -42,7 +42,7 @@ class multi_reed_xml():
         list_path_xml = self.filter_file_dir_xml()
 
         for file in list_path_xml:
-            xml = CFDI(file, self.RFC)
+            xml = cfdi.cfdiCFDI(file, self.RFC)
             
             data = xml.main()         
             self.__data__.append(data)

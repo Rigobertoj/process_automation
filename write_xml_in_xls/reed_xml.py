@@ -19,10 +19,21 @@ class Reed_xml():
         self.xml = path_document
         self.tree = ET.parse(self.xml)
         self.root = self.tree.getroot()
-    
+        self.__get__url_CFDI__
     
     def main(self):
         return self.get_obj_childs(self.root)
+    
+    def __get__url_CFDI__(self):
+        try:
+            urls = self.root.get(
+                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation").split(" ")
+            self.__URL_IMPUESTO_LOCAL__ = "{"+f"{next(filter(lambda url: 'implocal' in url, urls))}"+"}"
+        except StopIteration:
+            self.__URL_IMPUESTO_LOCAL__ = None
+
+        url = self.root.tag.split("}")[0]
+        self.__URL_CFDI__ = url + "}"
     
     
     def validate_path(self, path: str):

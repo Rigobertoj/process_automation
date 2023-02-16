@@ -17,24 +17,13 @@ class CFDI (Reed_xml):
     def test(self):
         data = self.get_clave_prod_serv()
 
-    def __get__url_CFDI__(self):
-        try:
-            urls = self.root.get(
-                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation").split(" ")
-            self.__URL_IMPUESTO_LOCAL__ = "{"+f"{next(filter(lambda url: 'implocal' in url, urls))}"+"}"
-        except StopIteration:
-            self.__URL_IMPUESTO_LOCAL__ = None
 
-        url = self.root.tag.split("}")[0]
-        self.__URL_CFDI__ = url + "}"
 
     def main(self):
         self.__get__url_CFDI__()
         fecha_De_facturacion = self.fecha_facturacion()
-        # print(fecha_De_facturacion)
+
         self.conceptos = self.get_conceptos()
-        # print("clv",type(self.conceptos["Clave de producto o servicio."]))
-        # print(self.conceptos)
 
         folio_fiscal = self.get_file_name()
         folio_de_la_factura = self.get_invoice_folio()
