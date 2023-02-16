@@ -34,8 +34,8 @@ class write_xlsx():
 
 
         """
-        self.validate_xlsx_file(path_file,file_name)
-        print(self.wb.sheetnames)
+        a = self.validate_xlsx_file(path_file,file_name)
+        print(a)
         self.__path_file__ = path_file + file_name
     
 

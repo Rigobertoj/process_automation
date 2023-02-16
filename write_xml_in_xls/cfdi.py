@@ -62,7 +62,7 @@ class CFDI (Reed_xml):
             "Ret. IVA." : Ret_IVA ,
             "Ret. ISR." : Ret_ISR,
             "Total." : total, 
-            "Bancos.": "=J6-K6+L6+M6-N6-O6=P6",
+            "Bancos.": "=J2-K2+L2+M2-N2-O2=P2",
             "Folio relacionado" : Folio_fiscal_relacionado,
         }
     
@@ -236,6 +236,7 @@ class CFDI (Reed_xml):
         
             Retencion = list(map(self.get_items, list(Traslado.values())))
             data_traslados= list({objeto['Impuesto'] : float(objeto['Importe']) for objeto in Retencion}.values())
+            print(data_traslados)
             return reduce( lambda acc, current_value : acc + current_value, data_traslados) 
         
         except KeyError or AttributeError:
@@ -294,13 +295,12 @@ class CFDI (Reed_xml):
             Impuestos = {Deducion["TipoDeduccion"] : Deducion["Importe"]  for Deducion in data_deducciones}
 
             ISR = Impuestos.pop("002")
-            IMSS = reduce(lambda acc, current : acc + current, list(Impuestos.values()))
+            Descuentos_deducciones = reduce(lambda acc, current : acc + current, map(float ,Impuestos.values()))
         except AttributeError:
             return None
         except TypeError:
-            IMSS = 0          
-
-        return ISR, IMSS
+            Descuentos_deducciones = 0 
+        return ISR, Descuentos_deducciones
         
     def get_folio_relaciones(self):
         """Desccripcion : Metodo que nos permite obtener el folio relacionado de un CFDI para asi saber cual es el estado del mismo
@@ -324,22 +324,10 @@ class CFDI (Reed_xml):
 if __name__ == '__main__' :
         
     RFC = "PPR0610168Z1"
-    fact_pago_emitida = "read_CFDI/2021/Enero/Emitidas/2f99dd73-df61-4481-bc02-34010db1fd3a.xml"
-    fact_nomina = "read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
-    fact_muchos_conceptos = "./read_CFDI/B9464F75-F69B-49FA-9A59-DB556505F669.xml"
-    fact_honorarios = "./read_CFDI/AAA19A00-5E5C-4A80-973B-3F3022AD76DC.xml"
-    fact_nomina_2 = "./read_CFDI/Nomina/E211FFAB-D67D-4373-968E-83C02741628F.xml"
-    problemas_iva = "read_CFDI/2021/Enero/Recibidas/26cadc4a-b591-4912-911e-20a57252de24.xml"
-    Problemas_complemento = "read_CFDI/2021/Enero/Recibidas/1ab75101-13d5-4a88-ab93-3e123df5b38b.xml"
-    pago_nomina_enero = "read_CFDI/2021/Enero/Emitidas/ae8fe564-d3ba-4df4-98ed-0475bd33ec40.xml"
+    problemas_descuento = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
+    path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero/Febrero/E2255876-7EBC-48F0-B4E9-B51AA23D881E.xml"
+    cfdi = CFDI(path_recibidas,RFC)
     
-    dos_conceptos = "read_CFDI/2022/07JULIO/PPR0610168Z1_1877_REI030507D15.xml"
-    
-    path = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Ingresos/0960a1e0-4a41-4586-a49f-5c03576e337e.xml"
-
-    Sustitución_de_los_CFDI_previos = "C:/Users/User/Documents/Rigo/sofware/process_automation/write_xml_in_xls/read_CFDI/2023/Enero/1E2A6FB9-E71B-4389-8E4E-8786E80020F9.xml"
-
-    cfdi = CFDI(fact_pago_emitida,RFC)
     data = cfdi.main()
     for key, value in data.items():
         print(

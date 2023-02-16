@@ -32,27 +32,27 @@ def data_2021() -> None:
     pass
 
 def data_febrero_2023(RFC, name_sheet):
-    path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero"
+    path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero/Febrero"
     path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"
-    path_xlsx_recibidas = "C:/Users/User/Documents/Rigo/2023/Ingresos/Febrero"
-    path_xlsx_emitidas = "C:/Users/User/Documents/Rigo/2023/Egresos/Febrero"
+    path_xlsx_emitidas = "C:/Users/User/Documents/Rigo/2023/Ingresos/Febrero"
+    path_xlsx_recibidas = "C:/Users/User/Documents/Rigo/2023/Egresos/Febrero"
 
 
 
-    Data_Emitidas = get_xml_data(path_emitidas,RFC)
-    insert_data(
-        path_xlsx_emitidas,
-        "Febrero",
-        name_sheet,
-        "A1", 
-        Data_Emitidas
-        )
-    del Data_Emitidas
+    # Data_Emitidas = get_xml_data(path_emitidas,RFC)
+    # insert_data(
+    #     path_xlsx_emitidas,
+    #     "Emitidas.xlsx",
+    #     name_sheet,
+    #     "A1", 
+    #     Data_Emitidas
+    #     )
+    # del Data_Emitidas
     
     Data_recibidas = get_xml_data(path_recibidas, RFC)
     insert_data(        
         path_xlsx_recibidas,
-        "Febrero",
+        "Recibidas.xlsx",
         name_sheet,
         "A1", 
         Data_recibidas
