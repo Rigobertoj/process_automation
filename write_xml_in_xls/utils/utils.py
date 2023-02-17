@@ -4,7 +4,7 @@ from functools import reduce
 
 def sort_dict_by_value(d : dict[str : int | float]) -> dict: 
     """
-    Descripcion : funcion que nos permite ordenar un diccionario en vase a su clave
+    Descripcion : funcion que nos permite ordenar un diccionario en vase a su valor
 
     Params:
         - d (dict) : diccionario 
@@ -93,6 +93,7 @@ def sort_dict_by_value(d : dict):
     return dict(sorted(d.items(), key=lambda item: float(item[1])))
 
 split_space = lambda string : string.split(" ")
+
 
 if __name__ == "__main__":
     data = {'80101500': '1600.00', '80101500 1': '5000.00', "80101502" : '100.00'}

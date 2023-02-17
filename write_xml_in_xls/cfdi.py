@@ -304,7 +304,15 @@ class Impuestos(Reed_xml):
         super().__init__(path_document)
     
     
-    def get_element_in_taxes(self, name_tag_element_xml):
+    def get_element_in_taxes(self, name_tag_element_xml) -> ET.Element | None:
+        """Description : metodo que nos permite buscar un elemento dentro de la seccion de impuestos
+
+        Args:
+            name_tag_element_xml (str): Nombre del elemento que queremos buscar en la seccion de impuestos en el elemento
+
+        Returns:
+            (ET.Element) | None : retorna el elemento xml si es que lo encontro
+        """
         element_taxes = self.get_element(self.root, "Impuestos")
         return maybe.unit_maybe(element_taxes)\
             .bind(
@@ -312,85 +320,33 @@ class Impuestos(Reed_xml):
                 )\
             .value
         
-    def get_taxes_2(self, type):
-        element = self.get_element_in_taxes(type)
-        child_element = self.get_childs(element)
-        data_child = list(map(self.get_items, list(child_element.values())))
-        return {obj["Impuesto"] : obj["Importe"] for obj in data_child}
         
-        
-    def get_retenciones(self) -> int:
-        try:
-            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-
-            if not Impuestos:
-                return None
-
-            Retenciones = Impuestos.find(f"{self.__URL_CFDI__}Retenciones")
-
-            if not Retenciones:
-                return None
-
-            elements = self.get_childs(Retenciones)
-
-            data_elements = list(map(self.get_items, list(elements.values())))
-            return {obj["Impuesto"]: float(obj["Importe"]) for obj in data_elements}
-
-        except KeyError or AttributeError:
-            print(F"ERROR: get_retenciones -> {self.get_retenciones()}")
-            return None
-
-
-    def search_tag(self, name_tag: str, element: ET.Element):
-        try:
-            return lambda URL: next(
-                filter(
-                    lambda e: e.tag == f"{URL}{name_tag}", element.iter()
-                )
-            )
-        except StopIteration:
-            return None
-
-    def get_traslado(self, tipo_impuesto : str, ) -> dict[str]:
-        """Description : Metodo que me permite obtener el monto de un tipo de impuesto que exista dentro de la factura de la
+    def get_data_taxes(self, type):
+        """Description : metodo que nos permite obtener los datos de un elemento xml sobre el importe del pago de impuestos 
 
         Args:
-            - tipo_impuesto (str): Es el tipo de impuesto que querramos buscar dentro de la factura ya sea :
-                -  Traslados
-                -  Retenciones
+            type (str): Nombre del elemento xml al cual se le extrera la informacion
+
         Returns:
-            :
+            dict[str: float ]: diccionario con los datos del importe de un tipo de impuesto
         """
+        #obtenemos el elemento xml
+        element = self.get_element_in_taxes(type)
+        #obtenemos los hijos del elemento xml
+        child_element = self.get_childs(element)
+        #mapeamos los objetos de la clase ET.Element para obtener sus atributos
+        data_child = list(map(self.get_items, list(child_element.values())))
+        # extraemos solo los datos del tipo de impuesto y el importe
+        
 
-        try:
-            print(self.__URL_CFDI__)
-            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            print(Impuestos)
-
-            if not Impuestos:
-                return None
-
-            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
-            element_traslado = self.get_childs(Traslados)
-            print(Traslados)
-            print(list(element_traslado.values()))
-
-            traslado = list(map(self.get_items, list(element_traslado.values())))
-            print(f"traslados {traslado}")
-            
-            data = {obj["Impuesto"] : obj["Importe"] for obj in traslado}
-            print(data)
-            return data 
-
-        except KeyError or AttributeError:
-            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
-            return None
-
-        except StopIteration:
-            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
-            return None
-
-
+        new_obj = {
+            f"{obj['Impuesto']} {index}" if obj['Impuesto'] in new_obj else obj['Impuesto']: obj['Importe'] 
+            for index, obj in enumerate(data_child)
+            }
+                
+        return new_obj
+    
+        
     def get_taxes(self):
         """Descripcion : metodo que nos permite obtener de manera estructurada los impuestos de la factura
 
@@ -398,8 +354,9 @@ class Impuestos(Reed_xml):
             Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
         """
 
-        traslado = self.get_traslado("")
-        ret = self.get_retenciones() or {}
+        traslado = self.get_data_taxes("Traslados") or {}
+        
+        ret = self.get_data_taxes("Retenciones") or {}
 
         return traslado.get("002"), ret.get("002"), ret.get("001"),
 
@@ -466,7 +423,7 @@ if __name__ == '__main__':
 
     cfdi = CFDI(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml", RFC)
     impuestos = Impuestos(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml")
-    i = impuestos.get_taxes_2("Traslados")
+    i = impuestos.get_taxes()
     print(f"Impuestos {i}")
     seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
 
