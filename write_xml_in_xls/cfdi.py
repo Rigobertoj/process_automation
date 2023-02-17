@@ -14,11 +14,6 @@ class CFDI (Reed_xml):
         self.__Nombre__ = nombre
         self.root_attrs = self.get_items(self.root)
 
-    def test(self):
-        data = self.get_clave_prod_serv()
-
-
-
     def main(self):
         self.__get__url_CFDI__()
         fecha_De_facturacion = self.fecha_facturacion()
@@ -290,7 +285,13 @@ class CFDI (Reed_xml):
         except StopIteration:
             return None
 
-    def _Element_Impuestos_locales_(self):
+
+class Impuestos_locales(Reed_xml):
+    def __init__(self, path_document: str) -> None:
+        super().__init__(path_document)
+    
+    
+    def _element_Impuestos_locales_(self):
         """Descripcion : Metodo que me permite validar si existe un elemento de impuestos locales y envace a si si o no poder procesar este mismo para retorna ele elemento en si
 
         Returns:
@@ -306,17 +307,30 @@ class CFDI (Reed_xml):
             .bind(list)\
             .bind(lambda elemnt_list: elemnt_list[0] if list(elemnt_list) else None).value
         
-    def Impuestos_locales(self):
+    def impuestos_locales_acre_tras(self, type : str ):
         """Descripcion : metodo que me permite obtener los impuestos locales que pudieran exstir dentro de una factura
-
+        
+        Params :
+            - type (str) : es el tipo de impuesto si acreditable o trasladado
+                - TotaldeTraslados
+                - TotaldeRetenciones
+        
         Returns:
             float: es el monto de los impuestos acreditables que nos podrian cobrar por algun servicio o producto
         """
-        return maybe.unit_maybe(self._Element_Impuestos_locales_())\
-            .bind(lambda element : element.get("TotaldeTraslados"))\
+        return maybe.unit_maybe(self._element_Impuestos_locales_())\
+            .bind(lambda element : element.get(type))\
             .value
-        
-        
+            
+    def Impuestos_locales(self):
+        """Description : Metodo que nos permite obtener los impuesto acreditables y traslados locales
+
+        Returns:
+            tupla[float, float]: es una tupla con los datos de los impuestos acreditables y trasladados locales
+        """
+        Acreditables = self.impuestos_locales_acre_tras("TotaldeTraslados")
+        Trasladados = self.impuestos_locales_acre_tras("TotaldeRetenciones")
+        return Acreditables, Trasladados
 
 
 
@@ -330,10 +344,11 @@ if __name__ == '__main__':
     Hospedaje_file = "0A310817-8381-439E-B278-AD69F9ED8C80.xml"
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
     cfdi = CFDI(f"{path_hospedaje}", RFC)
+    seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
 
     data = cfdi.main()
     for key, value in data.items():
         print(
             f"""
         {key} : {value}""")
-    cfdi.Impuestos_locales()
+    print(seccion_impuestos_locales.Impuestos_locales())

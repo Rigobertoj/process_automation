@@ -19,7 +19,7 @@ class Reed_xml():
         self.xml = path_document
         self.tree = ET.parse(self.xml)
         self.root = self.tree.getroot()
-        self.__get__url_CFDI__
+        self.__get__url_CFDI__()
     
     def main(self):
         return self.get_obj_childs(self.root)
