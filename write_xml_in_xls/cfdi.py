@@ -286,6 +286,76 @@ class CFDI (Reed_xml):
             return None
 
 
+class Impuestos(Reed_xml):
+    def __init__(self, path_document: str) -> None:
+        super().__init__(path_document)
+        
+        
+    def get_retenciones(self) -> int:
+        try:
+            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+            if not Impuestos:
+                return None
+
+            Retenciones = Impuestos.find(f"{self.__URL_CFDI__}Retenciones")
+
+            if not Retenciones:
+                return None
+
+            elements = self.get_childs(Retenciones)
+            data_elements = list(map(self.get_items, list(elements.values())))
+            return {obj["Impuesto"]: float(obj["Importe"]) for obj in data_elements}
+
+        except KeyError or AttributeError:
+            print(F"ERROR: get_retenciones -> {self.get_retenciones()}")
+            return None
+
+
+    def search_tag(self, name_tag: str, element: ET.Element):
+        try:
+            return lambda URL: next(
+                filter(
+                    lambda e: e.tag == f"{URL}{name_tag}", element.iter()
+                )
+            )
+        except StopIteration:
+            return None
+
+    def get_traslado(self) -> dict[str]:
+        try:
+            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+
+            if not Impuestos:
+                return None
+
+            Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
+            Traslado = self.get_childs(Traslados)
+
+            Retencion = map(self.get_items, list(Traslado.values()))
+            return sum(float(objeto["Importe"]) for objeto in Retencion)
+
+        except KeyError or AttributeError:
+            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
+            return None
+
+        except StopIteration:
+            print(F"ERROR: get_traslado -> {self.get_retenciones()}")
+            return None
+
+
+    def get_taxes(self):
+        """Descripcion : metodo que nos permite obtener de manera estructurada los impuestos de la factura
+
+        Returns:
+            Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
+        """
+
+        traslado = self.get_traslado()
+        ret = self.get_retenciones() or {}
+
+        return traslado, ret.get("002"), ret.get("001"),
+
+
 class Impuestos_locales(Reed_xml):
     def __init__(self, path_document: str) -> None:
         super().__init__(path_document)
@@ -344,6 +414,9 @@ if __name__ == '__main__':
     Hospedaje_file = "0A310817-8381-439E-B278-AD69F9ED8C80.xml"
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
     cfdi = CFDI(f"{path_hospedaje}", RFC)
+    impuestos = Impuestos(path_hospedaje)
+    i = impuestos.get_taxes()
+    print(i)
     seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
 
     data = cfdi.main()
