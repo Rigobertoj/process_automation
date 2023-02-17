@@ -29,7 +29,7 @@ class CFDI (Reed_xml):
         total = float(self.get_total())
 
         IVA, Ret_IVA, Ret_ISR = self.get_taxes()
-        
+
         if self.searh_in_complement("Nomina"):
             print("Nomina")
             Ret_ISR, Descuentos = self.get_data_nominas()
@@ -231,12 +231,12 @@ class CFDI (Reed_xml):
 
     def searh_in_complement(self, name_tag: str):
         """ Description Metodo que nos permite validar si existe algun elemento xml dentro de la seccion complemento del CFDI.
-        
-        Params : 
+
+        Params :
             -name_tag : Nombre de la etiqueta que queremos buscar dentro de la seccion complemento.
-        
+
         return (boolean): retorna un valor booleano dependiendo de la validacion, si existe el elemento retornara True
-        """        
+        """
         return maybe.unit_maybe(f"{self.__URL_CFDI__}Complemento")\
             .bind(self.root.find)\
             .bind(lambda element_xml : self.get_items(self.get_childs(element_xml)))\
@@ -254,7 +254,7 @@ class CFDI (Reed_xml):
 
         Impuestos = {}
         def get_data(e): return self.get_items(self.get_childs(e))
-        
+
         try:
             Complemento = get_data(self.root)["Complemento"]
             concept_complemento = get_data(Complemento)
@@ -271,15 +271,15 @@ class CFDI (Reed_xml):
             Descuentos_deducciones = reduce(
                 lambda acc, current: acc + current, map(float, Impuestos.values())
                 )
-            
+
         except AttributeError:
             print("Error get_data_nominas AttributeError")
             return None
         except TypeError:
             print("Error get_data_nominas typeerror")
             Descuentos_deducciones = 0
-            
-        print(f"Nomina {ISR, Descuentos_deducciones}")    
+
+        print(f"Nomina {ISR, Descuentos_deducciones}")
         return ISR, Descuentos_deducciones
 
     def get_folio_relaciones(self):
@@ -302,12 +302,27 @@ class CFDI (Reed_xml):
 class Impuestos(Reed_xml):
     def __init__(self, path_document: str) -> None:
         super().__init__(path_document)
+    
+    
+    def get_element_in_taxes(self, name_tag_element_xml):
+        element_taxes = self.get_element(self.root, "Impuestos")
+        return maybe.unit_maybe(element_taxes)\
+            .bind(
+                lambda element_xml : self.get_element(element_xml, name_tag_element_xml)
+                )\
+            .value
+        
+    def get_taxes_2(self, type):
+        element = self.get_element_in_taxes(type)
+        child_element = self.get_childs(element)
+        data_child = list(map(self.get_items, list(child_element.values())))
+        return {obj["Impuesto"] : obj["Importe"] for obj in data_child}
         
         
     def get_retenciones(self) -> int:
         try:
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            
+
             if not Impuestos:
                 return None
 
@@ -317,9 +332,8 @@ class Impuestos(Reed_xml):
                 return None
 
             elements = self.get_childs(Retenciones)
-            
+
             data_elements = list(map(self.get_items, list(elements.values())))
-            print(f"retenciones {data_elements}")
             return {obj["Impuesto"]: float(obj["Importe"]) for obj in data_elements}
 
         except KeyError or AttributeError:
@@ -345,23 +359,28 @@ class Impuestos(Reed_xml):
                 -  Traslados
                 -  Retenciones
         Returns:
-            : 
+            :
         """
-        
+
         try:
             print(self.__URL_CFDI__)
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
-            print(Impuestos)            
+            print(Impuestos)
+
             if not Impuestos:
-                print("Fallo impuesos")
                 return None
 
             Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
-            Traslado = self.get_childs(Traslados)
+            element_traslado = self.get_childs(Traslados)
+            print(Traslados)
+            print(list(element_traslado.values()))
+
+            traslado = list(map(self.get_items, list(element_traslado.values())))
+            print(f"traslados {traslado}")
             
-            Retencion = map(self.get_items, list(Traslado.values()))
-            print(f"traslados {list(Retencion)}")
-            return sum(float(objeto["Importe"]) for objeto in Retencion)
+            data = {obj["Impuesto"] : obj["Importe"] for obj in traslado}
+            print(data)
+            return data 
 
         except KeyError or AttributeError:
             print(F"ERROR: get_traslado -> {self.get_retenciones()}")
@@ -382,14 +401,14 @@ class Impuestos(Reed_xml):
         traslado = self.get_traslado("")
         ret = self.get_retenciones() or {}
 
-        return traslado, ret.get("002"), ret.get("001"),
+        return traslado.get("002"), ret.get("002"), ret.get("001"),
 
 
 class Impuestos_locales(Reed_xml):
     def __init__(self, path_document: str) -> None:
         super().__init__(path_document)
-    
-    
+
+
     def _element_Impuestos_locales_(self):
         """Descripcion : Metodo que me permite validar si existe un elemento de impuestos locales y envace a si si o no poder procesar este mismo para retorna ele elemento en si
 
@@ -405,22 +424,22 @@ class Impuestos_locales(Reed_xml):
             ))\
             .bind(list)\
             .bind(lambda elemnt_list: elemnt_list[0] if list(elemnt_list) else None).value
-        
+
     def impuestos_locales_acre_tras(self, type : str ):
         """Descripcion : metodo que me permite obtener los impuestos locales que pudieran exstir dentro de una factura
-        
+
         Params :
             - type (str) : es el tipo de impuesto si acreditable o trasladado
                 - TotaldeTraslados
                 - TotaldeRetenciones
-        
+
         Returns:
             float: es el monto de los impuestos acreditables que nos podrian cobrar por algun servicio o producto
         """
         return maybe.unit_maybe(self._element_Impuestos_locales_())\
             .bind(lambda element : element.get(type))\
             .value
-            
+
     def Impuestos_locales(self):
         """Description : Metodo que nos permite obtener los impuesto acreditables y traslados locales
 
@@ -439,15 +458,15 @@ if __name__ == '__main__':
     RFC = "PPR0610168Z1"
     path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"
     path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero/Febrero/"
-    
+
     problemas_descuento = f"{path_emitidas}/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
     Nomina = f"{path_emitidas}/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
     Hospedaje_file = "0A310817-8381-439E-B278-AD69F9ED8C80.xml"
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
-    
+
     cfdi = CFDI(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml", RFC)
     impuestos = Impuestos(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml")
-    i = impuestos.get_taxes()
+    i = impuestos.get_taxes_2("Traslados")
     print(f"Impuestos {i}")
     seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
 
@@ -458,5 +477,5 @@ if __name__ == '__main__':
         print(
             f"""
         {key} : {value}""")
-        
+
     print(seccion_impuestos_locales.Impuestos_locales())
