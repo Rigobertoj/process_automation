@@ -73,7 +73,7 @@ def data_febrero_2023(RFC, name_sheet):
     Data_recibidas = get_xml_data(path_recibidas, RFC)
     insert_data(        
         path_xlsx_recibidas,
-        "Recibidas 2.xlsx",
+        "Recibidas 3.xlsx",
         name_sheet,
         "A1", 
         Data_recibidas
