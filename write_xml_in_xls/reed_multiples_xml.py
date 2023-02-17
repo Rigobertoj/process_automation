@@ -42,7 +42,7 @@ class multi_reed_xml():
         list_path_xml = self.filter_file_dir_xml()
 
         for file in list_path_xml:
-            xml = cfdi.cfdiCFDI(file, self.RFC)
+            xml = cfdi.CFDI(file, self.RFC)
             
             data = xml.main()         
             self.__data__.append(data)
@@ -51,7 +51,6 @@ class multi_reed_xml():
 
     def get_data(self):
         self.get_data_from_multiples_xml()
-        print(self.__data__)
         return self.__data__
 
 if __name__ == '__main__':

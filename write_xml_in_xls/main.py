@@ -4,10 +4,31 @@ from reed_multiples_xml import multi_reed_xml
 
 
 def get_xml_data(directorio,RFC):
+    """Descripcion metodo que nos permite obtener la data de un directorio con XML para asi procesarlos
+
+    Args:
+        directorio (str): Es la ruta donde estan alojados los XML 
+        RFC (str): Es el RFC de la empresa que tiene dichos XML
+
+    Returns:
+        list[dict]: retorna una lista con los los diccionarios que tiene los datos de los CFDI de manera estructurada
+    """
     return multi_reed_xml(dir_path=directorio, RFC=RFC).get_data()
 
 
 def insert_data(Document_path : str, file_name : str, name_sheet : str, initial_cell : int, data : list):
+    """Description : Funcion que nos permite insertar la informcaion de los xml en un archivo excel del
+
+    Args:
+        Document_path (str): _description_
+        file_name (str): _description_
+        name_sheet (str): _description_
+        initial_cell (int): _description_
+        data (list): _description_
+
+    Returns:
+        _type_: _description_
+    """
     wb = xlsx.write_xlsx(Document_path, file_name)
     keys = lambda row : wb.write_row_by_range(name_sheet, initial_cell, list(row.keys()))
     keys(data[0])
@@ -52,7 +73,7 @@ def data_febrero_2023(RFC, name_sheet):
     Data_recibidas = get_xml_data(path_recibidas, RFC)
     insert_data(        
         path_xlsx_recibidas,
-        "Recibidas.xlsx",
+        "Recibidas 2.xlsx",
         name_sheet,
         "A1", 
         Data_recibidas
