@@ -7,7 +7,7 @@ def get_xml_data(directorio,RFC):
     """Descripcion metodo que nos permite obtener la data de un directorio con XML para asi procesarlos
 
     Args:
-        directorio (str): Es la ruta donde estan alojados los XML 
+        directorio (str): Es la ruta donde estan alojados los XML
         RFC (str): Es el RFC de la empresa que tiene dichos XML
 
     Returns:
@@ -39,12 +39,13 @@ def insert_data(Document_path : str, file_name : str, name_sheet : str, initial_
 def main():
     path_data = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero"
     xml_directorio_Egreos = f"C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Egresos"
-    xml_directorio_Ingresos = f"{path_data}/Ingresos" 
-    xls_directorio = f"{path_data}/Excel" 
+    xml_directorio_Ingresos = f"{path_data}/Ingresos"
+    xls_directorio = f"{path_data}/Excel"
     intial_cell = "A1"
-    
+
     DATA_CFDI_Ingresos = get_xml_data(xml_directorio_Ingresos, RFC)
     # DATA_CFDI_Egresos = get_xml_data(xml_directorio_Egreos, RFC)
+    print(len(DATA_CFDI_Ingresos))
     insert_data(xls_directorio,"Ingresos.xlsx", name_sheet,intial_cell, DATA_CFDI_Ingresos, )
     # insert_data(xls_directorio, "Egresos.xlsx", name_sheet,intial_cell,DATA_CFDI_Egresos)
 
@@ -65,27 +66,27 @@ def data_febrero_2023(RFC, name_sheet):
     #     path_xlsx_emitidas,
     #     "Emitidas.xlsx",
     #     name_sheet,
-    #     "A1", 
+    #     "A1",
     #     Data_Emitidas
     #     )
     # del Data_Emitidas
-    
+
     Data_recibidas = get_xml_data(path_recibidas, RFC)
-    insert_data(        
+    insert_data(
         path_xlsx_recibidas,
         "Recibidas 2.xlsx",
         name_sheet,
-        "A1", 
+        "A1",
         Data_recibidas
         )
     del Data_recibidas
-    
+
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
-    name_sheet = "Conjunto de gastos" 
-    
-    # main()
+    name_sheet = "Conjunto de gastos"
+
+    main()
     # data_2021()
-    data_febrero_2023(RFC, name_sheet)
+    # data_febrero_2023(RFC, name_sheet)
     pass

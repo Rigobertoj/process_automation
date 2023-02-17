@@ -1,5 +1,7 @@
 from reed_xml import Reed_xml, foreach
+import sys
 from utils import utils, maybe
+print(dir(maybe))
 from functools import reduce
 from typing import Optional, Union
 import xml.etree.cElementTree as ET
@@ -322,14 +324,14 @@ class CFDI (Reed_xml):
 
 
 if __name__ == '__main__':
-
+    home_asus_xml_path = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Ingresos/1d1a55d4-1eaa-4890-9197-6aeda12e2f51.xml"
     RFC = "PPR0610168Z1"
     problemas_descuento = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
     path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero/Febrero/"
     
     Hospedaje_file = "0A310817-8381-439E-B278-AD69F9ED8C80.xml"
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
-    cfdi = CFDI(f"{path_hospedaje}", RFC)
+    cfdi = CFDI(f"{home_asus_xml_path}", RFC)
 
     data = cfdi.main()
     for key, value in data.items():
