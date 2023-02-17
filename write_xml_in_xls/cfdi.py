@@ -29,8 +29,9 @@ class CFDI (Reed_xml):
         total = float(self.get_total())
 
         IVA, Ret_IVA, Ret_ISR = self.get_taxes()
-
+        
         if self.searh_in_complement("Nomina"):
+            print("Nomina")
             Ret_ISR, Descuentos = self.get_data_nominas()
 
         Folio_fiscal_relacionado = self.get_folio_relaciones()
@@ -229,14 +230,20 @@ class CFDI (Reed_xml):
         return traslado, ret.get("002"), ret.get("001"),
 
     def searh_in_complement(self, name_tag: str):
-        try:
-            child_root = self.get_items(self.get_childs(self.root))
-            child_complemento = self.root.find(
-                f"{self.__URL_CFDI__}Complemento")
-            return name_tag in child_complemento
+        """ Description Metodo que nos permite validar si existe algun elemento xml dentro de la seccion complemento del CFDI.
+        
+        Params : 
+            -name_tag : Nombre de la etiqueta que queremos buscar dentro de la seccion complemento.
+        
+        return (boolean): retorna un valor booleano dependiendo de la validacion, si existe el elemento retornara True
+        """        
+        return maybe.unit_maybe(f"{self.__URL_CFDI__}Complemento")\
+            .bind(self.root.find)\
+            .bind(lambda element_xml : self.get_items(self.get_childs(element_xml)))\
+            .bind(lambda dict_element_xml : name_tag in dict_element_xml)\
+            .value
 
-        except (AttributeError, KeyError):
-            return False
+
 
     def get_data_nominas(self):
         """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le realizan a la nomina en cada una de las operaciones
@@ -247,8 +254,8 @@ class CFDI (Reed_xml):
 
         Impuestos = {}
         def get_data(e): return self.get_items(self.get_childs(e))
+        
         try:
-
             Complemento = get_data(self.root)["Complemento"]
             concept_complemento = get_data(Complemento)
             Data_nomina = get_data(concept_complemento["Nomina"])
@@ -262,11 +269,17 @@ class CFDI (Reed_xml):
 
             ISR = Impuestos.pop("002")
             Descuentos_deducciones = reduce(
-                lambda acc, current: acc + current, map(float, Impuestos.values()))
+                lambda acc, current: acc + current, map(float, Impuestos.values())
+                )
+            
         except AttributeError:
+            print("Error get_data_nominas AttributeError")
             return None
         except TypeError:
+            print("Error get_data_nominas typeerror")
             Descuentos_deducciones = 0
+            
+        print(f"Nomina {ISR, Descuentos_deducciones}")    
         return ISR, Descuentos_deducciones
 
     def get_folio_relaciones(self):
@@ -294,6 +307,7 @@ class Impuestos(Reed_xml):
     def get_retenciones(self) -> int:
         try:
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+            
             if not Impuestos:
                 return None
 
@@ -303,7 +317,9 @@ class Impuestos(Reed_xml):
                 return None
 
             elements = self.get_childs(Retenciones)
+            
             data_elements = list(map(self.get_items, list(elements.values())))
+            print(f"retenciones {data_elements}")
             return {obj["Impuesto"]: float(obj["Importe"]) for obj in data_elements}
 
         except KeyError or AttributeError:
@@ -321,17 +337,30 @@ class Impuestos(Reed_xml):
         except StopIteration:
             return None
 
-    def get_traslado(self) -> dict[str]:
-        try:
-            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+    def get_traslado(self, tipo_impuesto : str, ) -> dict[str]:
+        """Description : Metodo que me permite obtener el monto de un tipo de impuesto que exista dentro de la factura de la
 
+        Args:
+            - tipo_impuesto (str): Es el tipo de impuesto que querramos buscar dentro de la factura ya sea :
+                -  Traslados
+                -  Retenciones
+        Returns:
+            : 
+        """
+        
+        try:
+            print(self.__URL_CFDI__)
+            Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
+            print(Impuestos)            
             if not Impuestos:
+                print("Fallo impuesos")
                 return None
 
             Traslados = Impuestos.find(f"{self.__URL_CFDI__}Traslados")
             Traslado = self.get_childs(Traslados)
-
+            
             Retencion = map(self.get_items, list(Traslado.values()))
+            print(f"traslados {list(Retencion)}")
             return sum(float(objeto["Importe"]) for objeto in Retencion)
 
         except KeyError or AttributeError:
@@ -350,7 +379,7 @@ class Impuestos(Reed_xml):
             Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
         """
 
-        traslado = self.get_traslado()
+        traslado = self.get_traslado("")
         ret = self.get_retenciones() or {}
 
         return traslado, ret.get("002"), ret.get("001"),
@@ -408,20 +437,26 @@ class Impuestos_locales(Reed_xml):
 if __name__ == '__main__':
 
     RFC = "PPR0610168Z1"
-    problemas_descuento = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
+    path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"
     path_recibidas = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Febrero/Febrero/"
     
+    problemas_descuento = f"{path_emitidas}/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
+    Nomina = f"{path_emitidas}/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
     Hospedaje_file = "0A310817-8381-439E-B278-AD69F9ED8C80.xml"
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
-    cfdi = CFDI(f"{path_hospedaje}", RFC)
-    impuestos = Impuestos(path_hospedaje)
+    
+    cfdi = CFDI(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml", RFC)
+    impuestos = Impuestos(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml")
     i = impuestos.get_taxes()
-    print(i)
+    print(f"Impuestos {i}")
     seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
 
     data = cfdi.main()
+    result_nomina = cfdi.searh_in_complement("Nomina")
+    print(f"result_nomina {result_nomina}")
     for key, value in data.items():
         print(
             f"""
         {key} : {value}""")
+        
     print(seccion_impuestos_locales.Impuestos_locales())
