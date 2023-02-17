@@ -94,5 +94,19 @@ def sort_dict_by_value(d : dict):
 
 split_space = lambda string : string.split(" ")
 
+def invertir_barras(ruta):
+    """Description : funcion que toma una ruta con las barras \ en esta direccion e invierrte esta direccion (/)
+
+    Params : 
+        - ruta (str): una ruta que tenga las barra de esta manera \
+        
+    return (str) : retorna una ruta con las barras invertidas /
+    """
+    # Reemplazar las barras diagonales invertidas por barras diagonales normales
+    ruta_con_barras_normales = ruta.replace("\\", "/")
+    # Devolver la ruta invertida
+    return "/".join(reversed(ruta_con_barras_normales.split("/")))
+
+
 if __name__ == "__main__":
     data = {'80101500': '1600.00', '80101500 1': '5000.00', "80101502" : '100.00'}
