@@ -297,6 +297,50 @@ class CFDI (Reed_xml):
             return folio_relacionado
         except StopIteration:
             return None
+        
+        
+class Nominas(Reed_xml):
+    def __init__(self, path_document: str) -> None:
+        super().__init__(path_document)
+    
+    def get_data_nominas(self):
+        """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le retienen 
+
+        Return (Tuple[ ISR : str, IMSS : str])
+
+        """
+
+        Impuestos = {}
+        def get_data(e): return self.get_items(self.get_childs(e))
+
+        try:
+            Complemento = get_data(self.root)["Complemento"]
+            concept_complemento = get_data(Complemento)
+            Data_nomina = get_data(concept_complemento["Nomina"])
+            Deducciones = get_data(Data_nomina["Deducciones"])
+            
+            print(Deducciones)
+            
+            data_deducciones = list(
+                map(self.get_items, list(Deducciones.values()))
+            )
+            Impuestos = {Deducion["TipoDeduccion"]: Deducion["Importe"]
+                         for Deducion in data_deducciones}
+
+            ISR = Impuestos.pop("002")
+            Descuentos_deducciones = reduce(
+                lambda acc, current: acc + current, map(float, Impuestos.values())
+                )
+
+        except AttributeError:
+            print("Error get_data_nominas AttributeError")
+            return None
+        except TypeError:
+            print("Error get_data_nominas typeerror")
+            Descuentos_deducciones = 0
+
+        print(f"Nomina {ISR, Descuentos_deducciones}")
+        return ISR, Descuentos_deducciones
 
 
 class Impuestos(Reed_xml):
