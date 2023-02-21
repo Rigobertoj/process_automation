@@ -1,17 +1,23 @@
-from functools import reduce
 from typing import Optional, Union
 import xml.etree.cElementTree as ET
 import copy as c
 import os
-import time
-import sys
 from utils import maybe
 
 RFC = "PPR0610168Z1"    
 def foreach(func : callable, list : list):
     for i in range(len(list)):
         func(list[i])
-    
+
+def get_value_in_list(list : list[str] ,string_in_list : str):
+    return maybe.unit_maybe(list)\
+            .bind(lambda list: next(
+                filter(
+                    lambda element : string_in_list in element, 
+                    list
+                ), None))\
+            .value
+
 class Reed_xml():
     def __init__(self, path_document : str) -> None:
         if not self.validate_path(path_document): 
@@ -20,21 +26,27 @@ class Reed_xml():
         self.xml = path_document
         self.tree = ET.parse(self.xml)
         self.root = self.tree.getroot()
-        self.__get__url_CFDI__()
+        self.__set__url_CFDI__()
     
     def main(self):
         return self.get_obj_childs(self.root)
     
-    def __get__url_CFDI__(self):
-        try:
-            urls = self.root.get(
-                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation").split(" ")
-            self.__URL_IMPUESTO_LOCAL__ = "{"+f"{next(filter(lambda url: 'implocal' in url, urls))}"+"}"
-        except StopIteration:
-            self.__URL_IMPUESTO_LOCAL__ = None
+    def __set__url_CFDI__(self):
+        try :
+            schema = next(filter(lambda keys : "schemaLocation" in  keys, self.root.attrib.keys()))
+            urls = list(filter( lambda string : string != " " , self.root.get(schema).split(" ")))
 
-        url = self.root.tag.split("}")[0]
-        self.__URL_CFDI__ = url + "}"
+        except StopIteration:
+            schema = None
+    
+        self.__URL_CFDI__ = get_value_in_list(urls, "http://www.sat.gob.mx/cfd/")
+        
+        self.__URL_IMPUESTO_LOCAL__ = get_value_in_list(urls, "implocal")
+
+        self.__URL_NOMINA__ = get_value_in_list(urls, "http://www.sat.gob.mx/nomina" )
+
+        print(self.__URL_NOMINA__, self.__URL_CFDI__, self.__URL_IMPUESTO_LOCAL__)
+
     
     
     def validate_path(self, path: str):
@@ -180,15 +192,17 @@ class Reed_xml():
             .value
 
 if __name__ == "__main__":
-#CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"
-    print("--------------------------------------------------------------------------------------------------------------------------------------------")
+    home_asus_xml_path = "C:/Users/rigoj/Documents/profile/contabilidad/2023/XML/Enero/Ingresos/"
+    
     xml = "./read_CFDI/SEPTIEMBRE_CFDI/0DB6C48D-7EAD-49E5-9553-FD9AFFF3C97C.xml"
-    Nomina = "./read_CFDI/2021/Enero/Emitidas/10e2d438-f910-4036-874d-a9acc7504ca0.xml"
+    Nomina = f"{home_asus_xml_path}5f7025b8-2f8a-4530-bdbd-7d6c611fc0a2.xml"
     Problemas_complemento = "read_CFDI/2021/Enero/Recibidas/1ab75101-13d5-4a88-ab93-3e123df5b38b.xml"
     
-    DATA = Reed_xml(Problemas_complemento)
-    data = DATA.main()
+    DATA = Reed_xml(Nomina)
+    # data = DATA.main()
     # dir_path = './CFDI/testing_CFDI'
     # xml = reed_multiples_xml(dir_path, RFC=RFC)
-
-    print(data)
+    
+    urls = DATA.root.get("{http://www.w3.org/2001/XMLSchema-instance}schemaLocation").split(" ")
+    print(list(filter( lambda string : string != "" , urls)))
+    print(DATA.root.attrib.keys())

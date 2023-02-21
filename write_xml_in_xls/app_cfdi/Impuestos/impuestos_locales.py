@@ -24,6 +24,7 @@ class Impuestos_locales(Reed_xml):
             .bind(list)\
             .bind(lambda elemnt_list: elemnt_list[0] if list(elemnt_list) else None).value
 
+
     def impuestos_locales_acre_tras(self, type : str ):
         """Descripcion : metodo que me permite obtener los impuestos locales que pudieran exstir dentro de una factura
 
@@ -38,6 +39,7 @@ class Impuestos_locales(Reed_xml):
         return maybe.unit_maybe(self._element_Impuestos_locales_())\
             .bind(lambda element : element.get(type))\
             .value
+
 
     def Impuestos_locales(self):
         """Description : Metodo que nos permite obtener los impuesto acreditables y traslados locales
