@@ -484,8 +484,8 @@ def asus_home(RFC : str):
         print(f"""
         {key} : {value}""")
 
-    i = Impuestos(home_asus_xml_path)
-    i.get_taxes()
+    i = Impuestos(home_asus_xml_path, )
+    print(i.get_taxes())
 
 
 if __name__ == '__main__':
