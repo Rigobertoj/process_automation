@@ -323,14 +323,28 @@ class Nominas(Reed_xml):
             .value
     
 
-    def get_deducciones(self):
-        return maybe.unit_maybe(self.Nomina)\
-            .bind(lambda element_xml_nomina : self.get_element(element_xml_nomina, "Deducciones"))\
-            .bind(self.get_childs)\
-            .bind(lambda chils_element_xml_deducciones : list(chils_element_xml_deducciones.values()))\
-            .bind(lambda list_child_xml : map(self.get_items, list_child_xml ))\
-            .bind(list)\
-            .bind(lambda list_attr_child : utils.tranform_list_in_short_diccionary(list_attr_child, "TipoDeduccion", "Importe"))\
+    def get_nomina_deducciones(self):
+
+        def get_deducciones_element(xml_nomina):
+            return self.get_element(xml_nomina, "Deducciones")
+
+        def get_child_elements(xml_element):
+            return self.get_childs(xml_element).values()
+
+        def get_deduccion_items(xml_element):
+            return self.get_items(xml_element)
+
+        def map_deduccion_items(xml_elements):
+            return map(get_deduccion_items, xml_elements)
+
+        return maybe.unit_maybe(self.Nomina) \
+            .bind(get_deducciones_element) \
+            .bind(get_child_elements) \
+            .bind(list) \
+            .bind(map_deduccion_items) \
+            .bind(lambda deducciones: utils.transform_list_in_short_dictionary(
+                deducciones, "TipoDeduccion", "Importe"
+            )) \
             .value
     
     
@@ -402,7 +416,7 @@ def asus_home(RFC : str):
         {key} : {value}""")
 
     nomina = Nominas(f"{home_asus_xml_path}{Nomina}")
-    print(nomina.get_dedudcciones())
+    print(nomina.get_nomina_deducciones())
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"

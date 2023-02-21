@@ -107,7 +107,7 @@ def invertir_barras(ruta):
     # Devolver la ruta invertida
     return "/".join(reversed(ruta_con_barras_normales.split("/")))
 
-def tranform_list_in_short_diccionary(data : list[dict], key : str, value):
+def transform_list_in_short_dictionary(data : list[dict], key : str, value):
     """Descripccion : funcion que nos permite tomar una lista de diccionarios con claves estandars y reducirla a un diccionario que tomtara un de los valores de una key como key y tome el valor de key como value.
 
     params : 
