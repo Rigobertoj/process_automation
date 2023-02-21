@@ -1,5 +1,12 @@
 from app_cfdi.Impuestos.impuestos import Impuestos
+from app_cfdi.Nomina.Nomina import Nominas
 
+
+def test_nomina():
+    path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"
+    Nomina = f"{path_emitidas}/0B8B6950-EAB0-4DA2-B14A-B09B6DB8846E.xml"
+    nomina = Nominas(Nomina)
+    print(nomina.get_importes_nominas())
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
@@ -14,5 +21,6 @@ if __name__ == '__main__':
         i = Impuestos(home_asus_xml_path)
         print(i.get_taxes())
 
-    print("Enter")
-    asus_home(RFC)
+    # print("Enter")
+    # asus_home(RFC)
+    test_nomina()
