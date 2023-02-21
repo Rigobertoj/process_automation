@@ -5,6 +5,7 @@ import copy as c
 import os
 import time
 import sys
+from utils import maybe
 
 RFC = "PPR0610168Z1"    
 def foreach(func : callable, list : list):
@@ -19,7 +20,7 @@ class Reed_xml():
         self.xml = path_document
         self.tree = ET.parse(self.xml)
         self.root = self.tree.getroot()
-        self.__get__url_CFDI__
+        self.__get__url_CFDI__()
     
     def main(self):
         return self.get_obj_childs(self.root)
@@ -101,11 +102,6 @@ class Reed_xml():
         return list(map(get_names_tag, element))
         
 
-        
-        
-        
-        
-        
     def get_obj_childs(self, element : ET.Element):
         """descripcion : Metodo que nos retorna una lista con los objetos hijos de un elemento
 
@@ -167,7 +163,21 @@ class Reed_xml():
             # retiramos la extencion .xml que coforma los ultimos 4 caracteres
             return folio[:-4]
         
+        
+    def get_element(self,element_xml : ET.Element, name_tag : str):
+        """Description : Metodo que te permite buscar un elemento xml dentro de otro
 
+        Args:
+            element_xml (ET.Element): Es el elemento xml donde quiere buscar otro elemento xml
+            name_tag (str): es ele nombre de la etiqueta xml que necesitas buscar
+
+        Returns:
+            ET.Element: un elemento xml en caso de que si se encontro o None
+        """
+        url = element_xml.tag.split('}')[0] + '}'
+        return maybe.unit_maybe(f"{url}{name_tag}")\
+            .bind(element_xml.find)\
+            .value
 
 if __name__ == "__main__":
 #CFDI_TASA_0 = "./CFDI/7513B197-3F46-4807-B4E6-1001AAA07248.xml"

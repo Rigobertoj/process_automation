@@ -4,7 +4,7 @@ from functools import reduce
 
 def sort_dict_by_value(d : dict[str : int | float]) -> dict: 
     """
-    Descripcion : funcion que nos permite ordenar un diccionario en vase a su clave
+    Descripcion : funcion que nos permite ordenar un diccionario en vase a su valor
 
     Params:
         - d (dict) : diccionario 
@@ -106,6 +106,25 @@ def invertir_barras(ruta):
     ruta_con_barras_normales = ruta.replace("\\", "/")
     # Devolver la ruta invertida
     return "/".join(reversed(ruta_con_barras_normales.split("/")))
+
+def tranform_list_in_short_diccionary(data : list[dict], key : str, value):
+    """Descripccion : funcion que nos permite tomar una lista de diccionarios con claves estandars y reducirla a un diccionario que tomtara un de los valores de una key como key y tome el valor de key como value.
+
+    params : 
+        - data : es la lista con los diccionarios 
+        - key : es el nombre de la clave que sera tomada como key para los diccionarios 
+        - value : es el nomre de la clave que sera tomada como valor
+    
+    return dict : un diccionario que tiene todos los datos pasados en los anteriores parametros estructurados como un solo diccionario con clave y valor 
+    """
+
+    new_obj = {}
+    for index, obj in enumerate(data):
+        if obj[key] in new_obj:
+            new_obj[f"{obj[key]} {index}"] = obj[value]
+        else:
+            new_obj[obj[key]] = obj[value]
+    return new_obj
 
 
 if __name__ == "__main__":
