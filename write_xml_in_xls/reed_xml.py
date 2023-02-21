@@ -16,7 +16,9 @@ def get_value_in_list(list : list[str] ,string_in_list : str):
                     lambda element : string_in_list in element, 
                     list
                 ), None))\
+            .bind(lambda url : "{"+url+"}")\
             .value
+
 
 class Reed_xml():
     def __init__(self, path_document : str) -> None:
@@ -176,18 +178,19 @@ class Reed_xml():
             return folio[:-4]
         
         
-    def get_element(self,element_xml : ET.Element, name_tag : str):
+    def get_element(self,element_xml : ET.Element, name_tag : str, url : str = None):
         """Description : Metodo que te permite buscar un elemento xml dentro de otro
 
         Args:
             element_xml (ET.Element): Es el elemento xml donde quiere buscar otro elemento xml
             name_tag (str): es ele nombre de la etiqueta xml que necesitas buscar
+            url (str) : url que se tomara como espacio de nombre para la busqueda del elemento
 
         Returns:
             ET.Element: un elemento xml en caso de que si se encontro o None
         """
-        url = element_xml.tag.split('}')[0] + '}'
-        return maybe.unit_maybe(f"{url}{name_tag}")\
+        tag_url = url or element_xml.tag.split('}')[0] + '}'
+        return maybe.unit_maybe(f"{tag_url}{name_tag}")\
             .bind(element_xml.find)\
             .value
 
