@@ -126,6 +126,14 @@ def transform_list_in_short_dictionary(data : list[dict], key : str, value):
             new_obj[obj[key]] = obj[value]
     return new_obj
 
+def transform_list_in_short_dictionary_of_dictionary(data :list[str], key : str, values : list[str]):
+    new_obj = {}
+    for index, obj in enumerate(data):
+        if obj[key] in new_obj:
+            new_obj[f"{obj[key]} {index}"] = {value: obj[value] for value in values}
+        else:
+            new_obj[obj[key]] = {value: obj[value] for value in values}
+    return new_obj
 
 if __name__ == "__main__":
     data = {'80101500': '1600.00', '80101500 1': '5000.00', "80101502" : '100.00'}
