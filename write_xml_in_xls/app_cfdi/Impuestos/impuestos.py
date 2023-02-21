@@ -69,5 +69,4 @@ class Impuestos(Reed_xml):
         traslado = self.get_data_taxes("Traslados") or {}
         
         ret = self.get_data_taxes("Retenciones") or {}
-        traslado.update(ret)
         return traslado, ret,
