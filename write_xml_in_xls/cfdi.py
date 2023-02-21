@@ -16,7 +16,7 @@ class CFDI (Reed_xml):
         self.root_attrs = self.get_items(self.root)
 
     def main(self):
-        self.__get__url_CFDI__()
+        self.__set__url_CFDI__()
         fecha_De_facturacion = self.fecha_facturacion()
 
         self.conceptos = self.get_conceptos()
@@ -198,7 +198,6 @@ class CFDI (Reed_xml):
 
     def get_traslado(self) -> dict[str]:
         try:
-
             Impuestos = self.root.find(f"{self.__URL_CFDI__}Impuestos")
 
             if not Impuestos:
@@ -303,11 +302,26 @@ class CFDI (Reed_xml):
 class Nominas(Reed_xml):
     def __init__(self, path_document: str) -> None:
         super().__init__(path_document)
+        self.Nomina = self.__get_elements_nomina__()
+
+    def __get_elements_nomina__(self):
+        return maybe.unit_maybe(self.root)\
+            .bind(lambda root_element : self.get_element(root_element, "Complemento"))\
+            .bind(lambda elemnt_xml_complemento : self.get_element(elemnt_xml_complemento, "Nomina", self.__URL_NOMINA__))\
+            .value
     
 
-    def get_elements_xml(self):
-        element = self.get_element(self.root, "Complemento")
-        print(element)
+    def get_percepciones(self):
+        return maybe.unit_maybe(self.Nomina)\
+            .bind(lambda element_xml_nomina : self.get_element(element_xml_nomina, "Percepciones"))\
+            .bind(lambda element_xml_percepciones : {
+                "Importe sueldo" : element_xml_percepciones.get("TotalSueldos"),
+                "Importe exento" : element_xml_percepciones.get("TotalExento"),
+                "Importe Grabvddo" : element_xml_percepciones.get("TotalGravado")
+                } 
+            )\
+            .value
+
 
     def get_data_nominas(self):
         """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le retienen 
@@ -315,7 +329,7 @@ class Nominas(Reed_xml):
         Return (Tuple[ ISR : str, IMSS : str])
 
         """
-
+        
         Impuestos = {}
         def get_data(e): return self.get_items(self.get_childs(e))
 
@@ -377,7 +391,7 @@ def asus_home(RFC : str):
         {key} : {value}""")
 
     nomina = Nominas(f"{home_asus_xml_path}{Nomina}")
-    nomina.get_elements_xml()
+    nomina.get_percepciones()
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
