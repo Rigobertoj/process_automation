@@ -300,6 +300,7 @@ class CFDI (Reed_xml):
         
         
 class Nominas(Reed_xml):
+    
     def __init__(self, path_document: str) -> None:
         super().__init__(path_document)
         self.Nomina = self.__get_elements_nomina__()
@@ -317,7 +318,7 @@ class Nominas(Reed_xml):
             .bind(lambda element_xml_percepciones : {
                 "Importe sueldo" : element_xml_percepciones.get("TotalSueldos"),
                 "Importe exento" : element_xml_percepciones.get("TotalExento"),
-                "Importe Grabvddo" : element_xml_percepciones.get("TotalGravado")
+                "Importe Gravado" : element_xml_percepciones.get("TotalGravado")
                 } 
             )\
             .value
@@ -325,15 +326,19 @@ class Nominas(Reed_xml):
 
     def get_nomina_deducciones(self) -> dict[str : str] | None:
 
+        #obtenemos el elemento Deducciones del xml
         def get_deducciones_element(xml_nomina):
             return self.get_element(xml_nomina, "Deducciones")
 
+        # funcion que me permite obtener los objetos hijos de un elemento xml.
         def get_child_elements(xml_element):
             return self.get_childs(xml_element).values()
 
+        # funcion que me permite obtener los atributos de un elemento xml.
         def get_deduccion_items(xml_element):
             return self.get_items(xml_element)
 
+        # funcion que mapea un conjunto de elementos xml para obtener sus atributos.
         def map_deduccion_items(xml_elements):
             return map(get_deduccion_items, xml_elements)
 
@@ -343,7 +348,7 @@ class Nominas(Reed_xml):
             .bind(list) \
             .bind(map_deduccion_items) \
             .bind(lambda deducciones: utils.transform_list_in_short_dictionary(
-                deducciones, "TipoDeduccion", "Importe"
+                deducciones, "Concepto", "Importe"
             )) \
             .value
     
@@ -351,50 +356,9 @@ class Nominas(Reed_xml):
     def get_importes_nominas(self) :
         persepciones = self.get_nomina_percepciones()
         deducciones = self.get_nomina_deducciones()
+        persepciones.update(deducciones)
+        print(persepciones)
 
-        
-
-    
-    def get_data_nominas(self):
-        """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le retienen 
-
-        Return (Tuple[ ISR : str, IMSS : str])
-
-        """
-        
-        Impuestos = {}
-        def get_data(e): return self.get_items(self.get_childs(e))
-
-
-
-        try:
-            Complemento = get_data(self.root)["Complemento"]
-            concept_complemento = get_data(Complemento)
-            Data_nomina = get_data(concept_complemento["Nomina"])
-            Deducciones = get_data(Data_nomina["Deducciones"])
-            
-            print(Deducciones)
-            
-            data_deducciones = list(
-                map(self.get_items, list(Deducciones.values()))
-            )
-            Impuestos = {Deducion["TipoDeduccion"]: Deducion["Importe"]
-                         for Deducion in data_deducciones}
-
-            ISR = Impuestos.pop("002")
-            Descuentos_deducciones = reduce(
-                lambda acc, current: acc + current, map(float, Impuestos.values())
-                )
-
-        except AttributeError:
-            print("Error get_data_nominas AttributeError")
-            return None
-        except TypeError:
-            print("Error get_data_nominas typeerror")
-            Descuentos_deducciones = 0
-
-        print(f"Nomina {ISR, Descuentos_deducciones}")
-        return ISR, Descuentos_deducciones
 
 
 def asus_work():
@@ -407,10 +371,9 @@ def asus_work():
     path_hospedaje = f"{path_recibidas}/{Hospedaje_file}"
 
     cfdi = CFDI(f"{path_recibidas}24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml", RFC)
-    impuestos = Impuestos(f"{path_recibidas}/24E6E13E-C8A6-4797-AA0F-A202D9C259AA.xml")
-    i = impuestos.get_taxes()
-    print(f"Impuestos {i}")
-    seccion_impuestos_locales = Impuestos_locales(path_hospedaje)
+    nomina = Nominas(Nomina)
+    print(nomina.get_importes_nominas())
+    
 
 
 def asus_home(RFC : str):
@@ -423,7 +386,7 @@ def asus_home(RFC : str):
         {key} : {value}""")
 
     nomina = Nominas(f"{home_asus_xml_path}{Nomina}")
-    print(nomina.get_nomina_deducciones())
+    print(nomina.get_importes_nominas())
 
 if __name__ == '__main__':
     RFC = "PPR0610168Z1"
@@ -438,4 +401,4 @@ if __name__ == '__main__':
     #     {key} : {value}""")
 
     # print(seccion_impuestos_locales.Impuestos_locales())
-    asus_home(RFC)
+    asus_work()
