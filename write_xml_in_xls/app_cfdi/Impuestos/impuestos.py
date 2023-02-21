@@ -55,7 +55,7 @@ class Impuestos(Reed_xml):
         data_child_attributes = self.get_atributes_taxes_element(type)
 
         return  maybe.unit_maybe(data_child_attributes)\
-            .bind(lambda data_attr : utils.tranform_list_in_short_diccionary(data_attr, "Impuesto", "Importe"))\
+            .bind(lambda data_attr : utils.transform_list_in_short_dictionary_of_dictionary(data_attr, "Impuesto", ["Importe", "Base"]))\
             .value
 
     
@@ -63,11 +63,11 @@ class Impuestos(Reed_xml):
         """Descripcion : metodo que nos permite obtener de manera estructurada los impuestos de la factura
 
         Returns:
-            Tupla[int | None, int | None, int | None]: Retornamos una tupla con los valores del IVA, Ret de IVA y Ret de ISR en ese orden
+            Tupla[{}, {}]: Retornamos una tupla con 2 objetos el primero es el que tiene todos los datos de los impuestos traladados y el segunto es el que tiene las retenciones
         """
 
         traslado = self.get_data_taxes("Traslados") or {}
         
         ret = self.get_data_taxes("Retenciones") or {}
-
-        return traslado.get("002"), ret.get("002"), ret.get("001"),
+        traslado.update(ret)
+        return traslado, ret,
