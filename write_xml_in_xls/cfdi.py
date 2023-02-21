@@ -304,14 +304,14 @@ class Nominas(Reed_xml):
         super().__init__(path_document)
         self.Nomina = self.__get_elements_nomina__()
 
-    def __get_elements_nomina__(self):
+    def __get_elements_nomina__(self) -> ET.Element | None:
         return maybe.unit_maybe(self.root)\
             .bind(lambda root_element : self.get_element(root_element, "Complemento"))\
             .bind(lambda elemnt_xml_complemento : self.get_element(elemnt_xml_complemento, "Nomina", self.__URL_NOMINA__))\
             .value
     
 
-    def get_percepciones(self):
+    def get_nomina_percepciones(self) -> dict[str] | None:
         return maybe.unit_maybe(self.Nomina)\
             .bind(lambda element_xml_nomina : self.get_element(element_xml_nomina, "Percepciones"))\
             .bind(lambda element_xml_percepciones : {
@@ -323,7 +323,7 @@ class Nominas(Reed_xml):
             .value
     
 
-    def get_nomina_deducciones(self):
+    def get_nomina_deducciones(self) -> dict[str : str] | None:
 
         def get_deducciones_element(xml_nomina):
             return self.get_element(xml_nomina, "Deducciones")
@@ -347,6 +347,13 @@ class Nominas(Reed_xml):
             )) \
             .value
     
+
+    def get_importes_nominas(self) :
+        persepciones = self.get_nomina_percepciones()
+        deducciones = self.get_nomina_deducciones()
+
+        
+
     
     def get_data_nominas(self):
         """Descripcion : Metodo que nos permite obtener los impuestos o deducciones que se le retienen 
