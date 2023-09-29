@@ -66,7 +66,7 @@ class Reed_xml():
         return element.keys()
         
     
-    def get_values(self, element : ET.Element):
+    def get_values(self, element : ET.Element) -> list:
         """descripcion : metodo que nos otorga los valores de los atributos de un elemento xml
 
         Params:

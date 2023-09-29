@@ -297,7 +297,25 @@ class CFDI (Reed_xml):
             return folio_relacionado
         except StopIteration:
             return None
-        
+
+
+
+
+class Conceptos(Reed_xml):
+    def __init__(self, path_document: str) -> None:
+        super().__init__(path_document)
+
+
+class Concepto(Reed_xml):
+    def __init__(self, path_document: str) -> None:
+        super().__init__(path_document)
+
+
+def concepts():
+    path_cfdi = "C:/Users/User/Documents/Rigo/2023/XML/Recibidas/Enero/7A6A42D0-0448-479A-B996-75A734AFBCA3.xml"
+    
+    
+
 
 def asus_work():
     path_emitidas = "C:/Users/User/Documents/Rigo/2023/XML/Emitidas/Febrero/Febrero"

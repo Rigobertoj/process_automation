@@ -124,7 +124,7 @@ AGO_HONORARIOS = AGOSTO.searh_files_by_directory(Agos_Honorarios)
 SEP_FILES_NOT_FUND = AGOSTO.filter_files_not_found(Agos_Intereses|Agos_Arrendamientos|Agos_Honorarios)
 
 
-AGOSTO.move_list_file("Honorarios", AGO_HONORARIOS )
+AGOSTO.move_list_file("Honorarios", AGO_HONORARIOS)
 AGOSTO.move_list_file("Arrendamientos", AGO_ARRENDAMIENT)
 AGOSTO.move_list_file("Intereses", AGO_INTERESES)
 
